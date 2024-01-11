@@ -11,28 +11,37 @@ class Vehicle:
 
 #TODO: replace string object grid with class object .name()
 class Board:
-    def __init__(self, size):
+    def __init__(self, size=6):
         self.grid = np.array([[' '] * size] * size, dtype=object)
-        self.vehicles = []
+        self.vehicles_list = []
         self.size = size
 
-    def add_vehicle(self, vehicle):
-        self.vehicles.append(vehicle)
-        col, row = vehicle.position
-        if vehicle.orientation == 'H':
-            for i in range(vehicle.length):
-                self.grid[row][col + i] = vehicle
-        else:
-            for i in range(vehicle.length):
-                self.grid[row + i][col] = vehicle
+    def setup_board(self, gameboard):
+        # Set the grid of the board
+        for name, car in gameboard.iterrows():
+            # Set length to be an int instead of string
+            length = int(car['length'])
+
+            # Subtract 1 from position to make it zero-indexed
+            car['row'] -= 1
+            car['col'] -= 1
+
+            if name == 'X':
+                colour = np.array([255, 0, 0])
+            else:
+                # Random rgb colour
+                colour = np.random.choice(range(256), size=3)
+
+            # Create vehicle object and add it to the board, n serves as name
+            self.vehicles_list.append(Vehicle(length, car['orientation'], (car['col'], car['row']), n, colour))
 
     # Method to ensure pieces are actually on the board
     def find_vehicle(self, name):
-        for vehicle in self.vehicles:
+        for vehicle in self.vehicles_list:
             if vehicle.name == name:
                 return vehicle
         return None
-    
+    #-------------------------------------------------------------------------------------------------
     def place_piece(self, vehicle, new_position):
         col, row = new_position
         if col < 0 or col >= self.size or row < 0 or row >= self.size:
