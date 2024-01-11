@@ -1,11 +1,15 @@
+import numpy as np
+#TODO: import visualize
+
 class Vehicle:
-    def __init__(self, length, orientation, position, name, colour='black'):
+    def __init__(self, length, orientation, position, name, colour='white'):
         self.length = int(length)
         self.orientation = orientation
         self.position = position
         self.name = name
         self.colour = colour
 
+#TODO: replace string object grid with class object .name()
 class Board:
     def __init__(self, size):
         self.grid = np.array([[' '] * size] * size, dtype=object)
@@ -17,10 +21,10 @@ class Board:
         col, row = vehicle.position
         if vehicle.orientation == 'H':
             for i in range(vehicle.length):
-                self.grid[row][col + i] = vehicle.name
+                self.grid[row][col + i] = vehicle
         else:
             for i in range(vehicle.length):
-                self.grid[row + i][col] = vehicle.name
+                self.grid[row + i][col] = vehicle
 
     # Method to ensure pieces are actually on the board
     def find_vehicle(self, name):
@@ -35,10 +39,10 @@ class Board:
             raise ValueError("Position out of bounds")
         if vehicle.orientation == 'H':
             for i in range(vehicle.length):
-                self.grid[row][col + i] = vehicle.name
+                self.grid[row][col + i] = vehicle
         else:
             for i in range(vehicle.length):
-                self.grid[row + i][col] = vehicle.name
+                self.grid[row + i][col] = vehicle
 
     def move_piece(self, name, new_position):
         # Make sure piece is on the board
@@ -48,6 +52,10 @@ class Board:
 
         old_col, old_row = vehicle.position
         new_col, new_row = new_position
+        
+        # Subtract 1 to make inputs zero-indexed
+        new_col -= 1
+        new_row -= 1
 
         # Makes sure the piece is moving along it's orientation 
         if vehicle.orientation == 'H' and old_row != new_row:
@@ -86,11 +94,10 @@ class Board:
         vehicle.position = new_position
         self.place_piece(vehicle, new_position)
 
-    def print_board(board):
+    def print_board(self):
         """ 
         Prints the board in a neat format.
         """
-        for row in board.grid:
-            print(' '.join(str(x).ljust(2) for x in row))
+        visualize(self.grid, self.size)
 
 
