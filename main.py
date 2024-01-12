@@ -9,44 +9,45 @@ def main(gameboards):
     assert board_number >= 0 and board_number < len(gameboards), "Invalid board number"
     
     # Create bord class and initiate
+    print(gameboards[board_number])
     board = Board()
     board.setup_board(gameboards[board_number])
 
     moved_X = False
     while not moved_X:
         board.print_board()
-        car_name = input("Enter the name of the car to move: ")
+        car = None
+        valid_move = False
+        while valid_move == False:
+            player_move = input("Enter the car and it's movement: ")
+            player_move = player_move.split(',')
+        
+            if len(player_move) == 2:
+                car_name = player_move[0].upper()
+                movement = int(player_move[1])
+                valid_move = True
 
-        # Find the car and print its current position
-        car = board.find_vehicle(car_name)
-        if car is not None:
-            print(f"The current position of {car_name} is {car.position}")
-        else:
-            print(f"No car named {car_name} found on the board")
-            continue
-
-        # Check if input syntax is correct
-        while True:
-            try:
-                new_position = input("Enter the new position of the car (Shape = x,y): ")
-                if len(new_position.split(',')) != 2:
-                    raise ValueError
-                new_position = tuple(map(int, new_position.split(',')))
-            except ValueError:
-                print("Make sure to enter the position in the correct format! (Shape = x,y)")
-                #better try again... Return to the start of the loop
-                continue
             else:
-                break
+                player_move = print("Please use this format (A,1): ")
 
-        try:
-            board.move_piece(car_name, new_position)
-            print(f"Moved {car_name} to {new_position}:")
+            if valid_move == True:
+                # Find the car and print its current position
+                car = board.find_vehicle(car_name)
 
-            if car_name == 'X':
-                moved_X = True
-        except ValueError as e:
-            print(f"Failed to move {car_name} to {new_position}: {e}")
+                if car is None:
+                    print(f"No car named {car_name} found on the board")
+                    valid_move = False
+
+            # Check if input syntax is correct
+            if valid_move == True:
+                try:
+                    board.move_piece(car_name, movement)
+                except ValueError:
+                    valid_move = False
+                    print(f"You can't move {car_name} by {movement}")
+
+                if car_name == 'X':
+                    moved_X = True
 
 def open_gameboards():
     # Saves the boards in a list. 

@@ -7,8 +7,7 @@ def plot(vehicles, size):
     for vehicle in vehicles:
         a, b = vehicle.position
 
-        for i in range(vehicle.length):
-            print(i)
+        for i in range(vehicle.length + 1):
             if vehicle.orientation == 'H':
                 data[a][b + i] = vehicle.colour/255
             else :

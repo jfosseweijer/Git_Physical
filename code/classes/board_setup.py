@@ -3,7 +3,7 @@ from ..visualisation.visualize import plot as visualize
 
 class Vehicle:
     def __init__(self, length, orientation, position, name, colour='white'):
-        self.length = int(length)
+        self.length = int(length) - 1
         self.orientation = orientation
         self.position = position
         self.name = name
@@ -48,58 +48,69 @@ class Board:
                 return vehicle
         return None
 
-    def move_piece(self, name, new_position):
+    def move_piece(self, name, movement):
         # Make sure piece excists
         vehicle = self.find_vehicle(name)
         if vehicle is None:
             raise ValueError("Piece not found")
 
         old_col, old_row = vehicle.position
-        new_col, new_row = new_position
+        if vehicle.orientation == 'H':
+            old_positions = [old_col + i for i in range(vehicle.length + 1)]
+        else:
+            old_positions = [old_row + i for i in range(vehicle.length + 1)]
         
-        # Subtract 1 to make inputs zero-indexed
-        new_col -= 1
-        new_row -= 1
-
-        # Create lists of positions
-        old_positions = []
-        new_positions = []
-        for i in range(vehicle.length):
-            if vehicle.orientation == 'H':
-                old_positions.append((old_col, old_row + i))
-                new_positions.append((new_col, new_row + i))
-            else:
-                old_positions.append((old_col + i, old_row))
-                new_positions.append((new_col + i, new_row))
-
-        # Makes sure the piece is moving along it's orientation 
-        if vehicle.orientation == 'H' and old_row != new_row:
-            raise ValueError("Invalid move")
-        elif vehicle.orientation == 'V' and old_col != new_col:
-            raise ValueError("Invalid move")
-
-
-        # Makes sure new position is within the board
-        for item in new_positions:
-            col, row = item
-            if vehicle.orientation == 'H' and not 0 <= col < self.size:
+        # Makes sure the piece stays on the board
+        if vehicle.orientation == 'H':
+            new_row = old_row
+            new_col = old_col + movement
+            if movement > 0 and not 0 <= new_col + vehicle.length < self.size:
                 raise ValueError("Position out of bounds")
-            elif vehicle.orientation == 'V' and not 0 <= row < self.size:
+            if movement < 0 and not 0 <= new_col < self.size:
+                raise ValueError("Position out of bounds")
+        else:
+            new_col = old_col
+            new_row = old_row + movement
+            if movement > 0 and not 0 <= new_row + vehicle.length < self.size:
+                raise ValueError("Position out of bounds")
+            if movement < 0 and not 0 <= new_row < self.size:
                 raise ValueError("Position out of bounds")
 
-
-        # Check if new position is already occupied
-        for place in new_positions:
-            if place not in old_positions and place in self.vehicle_positions:
-                raise ValueError("New position already occupied")
-
-        # Update positions
         for old_place in old_positions:
             if old_place in self.vehicle_positions:
                 self.vehicle_positions.remove(old_place)
+
+        # Check if new position is already occupied
+        new_positions = []
+        for i in range(abs(movement)):
+            if vehicle.orientation == 'H':
+                new_positions.append((old_col + i, old_row))
+                if movement > 0:
+                    if old_col + vehicle.length + i in self.vehicles_list:
+                        place_error(old_positions)
+                else:
+                    if old_col - i in self.vehicles_list:
+                        place_error(old_positions)
+            else:
+                new_position.append(old_col, old_row + i)
+                if movement > 0:
+                    if old_row + vehicle.length + i in self.vehicles_list:
+                        place_error(old_positions)
+                else:
+                    if old_row - i in self.vehicles_list:
+                        place_error(old_positions)
+
+        # Update positions
         for new_place in new_positions:
             self.vehicle_positions.append(new_place)
         vehicle.position = (new_col,new_row)
+
+    def place_error(self, old_positions):
+        raise ValueError("New position already occupied")
+        for old_place in old_positions:
+            self.vehicle_positions.append(old_place)
+
+
 
     def print_board(self):
         """ 
