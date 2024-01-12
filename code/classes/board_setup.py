@@ -63,6 +63,9 @@ class Board:
         raise ValueError("New position already occupied")
     
     def move_piece(self, name, movement):
+        #TODO: Vehicles can jump over cars, not only check position but also moving way
+        #TODO: set of vehicles positions 
+        #TODO: intersection vehicle path and vehicle positions set
         # Make sure piece excists
         vehicle = self.find_vehicle(name)
         if vehicle is None:
@@ -112,4 +115,10 @@ class Board:
         """
         visualize(self.vehicles_list, self.size)
 
+    def is_won(self):
+        red_car = self.find_vehicle('X')
 
+        if red_car.positions[-1][1] >= self.size:
+            return True
+        else:
+            return False

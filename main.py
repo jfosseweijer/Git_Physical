@@ -12,8 +12,9 @@ def main(gameboards):
     board = Board(gameboards[board_number][1])
     board.setup_board(gameboards[board_number][0])
 
-    moved_X = False
-    while not moved_X:
+
+    winner = False
+    while winner == False:
         car = None
         valid_move = False
         while valid_move == False:
@@ -45,8 +46,10 @@ def main(gameboards):
                     valid_move = False
                     print(f"You can't move {car_name} by {movement}")
 
-                if car_name == 'X':
-                    moved_X = True
+        if car_name == 'X':
+            winner = board.is_won()
+
+    print("You smart boiii!!!")
 
 def open_gameboards():
     # Saves the boards in a list. 
