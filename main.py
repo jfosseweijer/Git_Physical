@@ -9,9 +9,8 @@ def main(gameboards):
     assert board_number >= 0 and board_number < len(gameboards), "Invalid board number"
     
     # Create bord class and initiate
-    print(gameboards[board_number])
-    board = Board()
-    board.setup_board(gameboards[board_number])
+    board = Board(gameboards[board_number][1])
+    board.setup_board(gameboards[board_number][0])
 
     moved_X = False
     while not moved_X:
@@ -54,9 +53,12 @@ def open_gameboards():
     gameboards = []
     path = os.path.join(os.getcwd(), 'data/gameboards')
     for filename in os.listdir(path):
+        size = int(filename[8])
+        if size == 1:
+            size = 12
         board_df = pd.read_csv(os.path.join(path, filename))
         board_df.set_index('car', inplace=True)
-        gameboards.append(board_df)
+        gameboards.append((board_df, size))
     return gameboards
 
 if __name__ == "__main__":

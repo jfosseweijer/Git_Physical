@@ -5,13 +5,9 @@ def plot(vehicles, size):
     data = np.ones((size, size, 3)) 
     
     for vehicle in vehicles:
-        a, b = vehicle.position
-
-        for i in range(vehicle.length + 1):
-            if vehicle.orientation == 'H':
-                data[a][b + i] = vehicle.colour/255
-            else :
-                data[a + i][b] = vehicle.colour/255
+        for position in vehicle.positions:
+            col, row = position
+            data[col][row] = vehicle.colour/255
 
     fig, (ax1, ax2) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [10, 1]}, figsize=(10, 5))
 

@@ -3,27 +3,40 @@ from ..visualisation.visualize import plot as visualize
 
 class Vehicle:
     def __init__(self, length, orientation, position, name, colour='white'):
-        self.length = int(length) - 1
+        self.length = int(length)
         self.orientation = orientation
-        self.position = position
         self.name = name
         self.colour = colour
+        self.set_positions(position)
+
+    def set_positions(self, position):
+        row, col = position
+
+        col -= 1
+        row -= 1
+        
+        if self.orientation == 'H':
+            self.positions = [(col, row + i) for i in range(self.length + 1)]
+        else:
+            self.positions = [(col + i, row) for i in range(self.length + 1)]
+
+    def change_position(self, new_positions):
+        self.positions = new_positions
+            
+
+
 
 class Board:
-    def __init__(self, size=12):
+    def __init__(self, size):
         self.vehicles_list = []
-        self.vehicle_positions = []
+        self.vehicle_position_list = []
         self.size = size
 
     def setup_board(self, gameboard):
         # Set the grid of the board
         for name, car in gameboard.iterrows():
             # Set length to be an int instead of string
-            length = int(car['length'])
-
-            # Subtract 1 from position to make it zero-indexed
-            car['row'] -= 1
-            car['col'] -= 1
+            length = int(car['length']) - 1
 
             if name == 'X':
                 colour = np.array([255, 0, 0])
@@ -31,14 +44,10 @@ class Board:
                 # Random rgb colour
                 colour = np.random.choice(range(256), size=3)
 
-            for i in range(length):
-                if car['orientation'] == 'H':
-                    self.vehicle_positions.append((car['col']+i, car['row']))
-                else:
-                    self.vehicle_positions.append((car['col'], car['row']+i))
-
             # Create vehicle object and add it to the board, n serves as name
-            self.vehicles_list.append(Vehicle(length, car['orientation'], (car['col'], car['row']), name, colour))
+            vehicle = Vehicle(length, car['orientation'], (car['col'], car['row']), name, colour)
+            self.vehicles_list.append(vehicle)                  
+            self.vehicle_position_list.append(vehicle.positions)
             
 
     # Method to ensure pieces are actually on the board
@@ -52,63 +61,49 @@ class Board:
         # Make sure piece excists
         vehicle = self.find_vehicle(name)
         if vehicle is None:
-            raise ValueError("Piece not found")
+            raise ValueError("Piece not found")        
 
-        old_col, old_row = vehicle.position
-        if vehicle.orientation == 'H':
-            old_positions = [old_col + i for i in range(vehicle.length + 1)]
-        else:
-            old_positions = [old_row + i for i in range(vehicle.length + 1)]
-        
+
+        # vehicles.positions = (col, row)
         # Makes sure the piece stays on the board
         if vehicle.orientation == 'H':
-            new_row = old_row
-            new_col = old_col + movement
-            if movement > 0 and not 0 <= new_col + vehicle.length < self.size:
+            if movement > 0 and not 0 <= vehicle.positions[-1][1] + movement < self.size:
                 raise ValueError("Position out of bounds")
-            if movement < 0 and not 0 <= new_col < self.size:
+            if movement < 0 and not 0 <= vehicle.positions[0][1] + movement < self.size:
                 raise ValueError("Position out of bounds")
         else:
-            new_col = old_col
-            new_row = old_row + movement
-            if movement > 0 and not 0 <= new_row + vehicle.length < self.size:
+            if movement > 0 and not 0 <= vehicle.positions[-1][0] + movement < self.size:
                 raise ValueError("Position out of bounds")
-            if movement < 0 and not 0 <= new_row < self.size:
+            if movement < 0 and not 0 <= vehicle.positions[0][0] + movement < self.size:
                 raise ValueError("Position out of bounds")
 
-        for old_place in old_positions:
-            if old_place in self.vehicle_positions:
-                self.vehicle_positions.remove(old_place)
+        #TODO: what if position is occupied, reset list
+        for position in vehicle.positions:
+            self.vehicle_position_list.remove(position)
 
+        new_positions=[]
+        if vehicle.orientation == 'H':
+            for position in vehicle.positions:
+                col, row = position
+                new_positions.append((col + movement, row))
+        else:
+            for position in vehicle.positions:
+                col, row = position
+                new_positions.append((col, row + movement))
+        
         # Check if new position is already occupied
-        new_positions = []
-        for i in range(abs(movement)):
-            if vehicle.orientation == 'H':
-                new_positions.append((old_col + i, old_row))
-                if movement > 0:
-                    if old_col + vehicle.length + i in self.vehicles_list:
-                        place_error(old_positions)
-                else:
-                    if old_col - i in self.vehicles_list:
-                        place_error(old_positions)
-            else:
-                new_position.append(old_col, old_row + i)
-                if movement > 0:
-                    if old_row + vehicle.length + i in self.vehicles_list:
-                        place_error(old_positions)
-                else:
-                    if old_row - i in self.vehicles_list:
-                        place_error(old_positions)
-
+        for position in new_positions:
+            if position in self.vehicle_position_list:
+                position_error(vehicle.positions)
+        
         # Update positions
-        for new_place in new_positions:
-            self.vehicle_positions.append(new_place)
-        vehicle.position = (new_col,new_row)
+        vehicle.change_position(new_positions)
 
-    def place_error(self, old_positions):
-        raise ValueError("New position already occupied")
+    def position_error(self, old_positions):
         for old_place in old_positions:
             self.vehicle_positions.append(old_place)
+        raise ValueError("New position already occupied")
+
 
 
 
