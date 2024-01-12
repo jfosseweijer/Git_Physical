@@ -1,23 +1,34 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot(vehicles, N):
-    data = np.zeros(N,N)
-    
-    data = vehicle.colour for vehicle in grid
+def plot(vehicles, size):
+    data = np.ones((size, size, 3)) 
 
-    # Show grid
-    plt.grid(axis='both', color='white', linewidth=2) 
-    plt.xticks(np.arange(0.5, data.shape[1], 1))  
-    plt.yticks(np.arange(0.5, data.shape[0], 1))
+    for vehicle in vehicles:
+        a, b = vehicle.position
+        for i in range(vehicle.length):
+            if vehicle.orientation == 'H':
+                data[a + i][b] = vehicle.colour/250
+            else :
+                data[a][b+ i] = vehicle.colour/250
+    data = np.clip(data, 0, 1)
+    fig, (ax1, ax2) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [10, 1]}, figsize=(10, 5))
 
-    # Disable labels
-    plt.tick_params(bottom=False, top=False, left=False, right=False, labelbottom=False, labelleft=False) 
-    
-    # Plot data matrix
-    plt.imshow(rgb_data, interpolation='nearest')
+    # Plot the image with grid on the first subplot
+    ax1.imshow(data, interpolation='nearest')
+    ax1.grid(axis='both', color='white', linewidth=2)
+    ax1.set_xticks(np.arange(0.5, data.shape[1], 1))
+    ax1.set_yticks(np.arange(0.5, data.shape[0], 1))
+    ax1.tick_params(bottom=False, top=False, left=False, right=False, labelbottom=False, labelleft=False)
 
-    # Display main axis 
+    # Create legend with explicit labels on the second subplot
+    for vehicle in vehicles:
+        ax2.plot([], [], color=np.array(vehicle.colour) / 255.0, label=vehicle.name)
+    ax2.legend()
+    ax2.axis('off')
+
+    # Adjust layout to prevent clipping of legend
+    plt.tight_layout()
+
+    # Show the figure
     plt.show()
-
-

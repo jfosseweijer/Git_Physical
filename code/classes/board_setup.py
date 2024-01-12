@@ -1,5 +1,5 @@
 import numpy as np
-#TODO: import visualize
+from ..visualisation.visualize import plot as visualize
 
 class Vehicle:
     def __init__(self, length, orientation, position, name, colour='white'):
@@ -32,14 +32,14 @@ class Board:
                 # Random rgb colour
                 colour = np.random.choice(range(256), size=3)
 
-            for i in length:
+            for i in range(length):
                 if car['orientation'] == 'H':
                     self.vehicle_positions.append((car['col'] + i, car['row']))
                 else:
                     self.vehicle_positions.append((car['col'], car['row'] + i))
 
             # Create vehicle object and add it to the board, n serves as name
-            self.vehicles_list.append(Vehicle(length, car['orientation'], (car['col'], car['row']), n, colour))
+            self.vehicles_list.append(Vehicle(length, car['orientation'], (car['col'], car['row']), name, colour))
             
 
     # Method to ensure pieces are actually on the board
@@ -79,8 +79,12 @@ class Board:
 
         # Makes sure new position is within the board
         for item in new_positions:
-            if not 0 < item < self.size:
+            col, row = item
+            if vehicle.orientation == 'H' and not 0 <= col < self.size:
                 raise ValueError("Position out of bounds")
+            elif vehicle.orientation == 'V' and not 0 <= row < self.size:
+                raise ValueError("Position out of bounds")
+
 
         # Check if new position is already occupied
         for place in new_positions:
@@ -96,6 +100,6 @@ class Board:
         """ 
         Prints the board in a neat format.
         """
-        visualize(self.grid, self.size)
+        visualize(self.vehicles_list, self.size)
 
 

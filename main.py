@@ -5,11 +5,13 @@ from code.classes.board_setup import Vehicle as Vehicle
 from code.classes.board_setup import Board as Board
 
 def main(gameboards):
-    board_number = int(input("Which board do you want to play (1-3): ")) - 1
+    board_number = int(input(f"Which board do you want to play 1-{len(gameboards)}?  ")) - 1
     assert board_number >= 0 and board_number < len(gameboards), "Invalid board number"
     
-    size = gameboards[board_number]['col'].max(axis=0)
-    board = setup_board(gameboards[board_number], size)
+    # Create bord class and initiate
+    board = Board(size=gameboards[board_number]['col'].max(axis=0))
+    board.setup_board(gameboards[board_number])
+
     moved_X = False
     while not moved_X:
         board.print_board()
@@ -45,31 +47,6 @@ def main(gameboards):
                 moved_X = True
         except ValueError as e:
             print(f"Failed to move {car_name} to {new_position}: {e}")
-
-
-
-
-def setup_board(gameboard, board_size=6):
-    # Set the grid of the board
-    board = Board(board_size)
-    for name, car in gameboard.iterrows():
-        # Set length to be an int instead of string
-        length = int(car['length'])
-
-        # Subtract 1 from position to make it zero-indexed
-        car['row'] -= 1
-        car['col'] -= 1
-
-        if name == 'X':
-            colour = np.array([255, 0, 0])
-        else:
-            # Random rgb colour
-            colour = np.random.choice(range(256), size=3)
-
-        # Create vehicle object and add it to the board, n serves as name
-        vehicle = Vehicle(length, car['orientation'], (car['col'], car['row']), n, colour)
-        board.add_vehicle(vehicle)
-    return board
 
 def open_gameboards():
     # Saves the boards in a list. 
