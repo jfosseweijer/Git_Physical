@@ -14,10 +14,10 @@ def main(gameboards):
 
     moved_X = False
     while not moved_X:
-        board.print_board()
         car = None
         valid_move = False
         while valid_move == False:
+            board.print_board()
             player_move = input("Enter the car and it's movement: ")
             player_move = player_move.split(',')
         

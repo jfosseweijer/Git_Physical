@@ -7,7 +7,7 @@ def plot(vehicles, size):
     for vehicle in vehicles:
         for position in vehicle.positions:
             col, row = position
-            data[col][row] = vehicle.colour/255
+            data[row][col] = vehicle.colour/255
 
     fig, (ax1, ax2) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [10, 1]}, figsize=(10, 5))
 

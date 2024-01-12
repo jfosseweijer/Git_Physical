@@ -1,4 +1,5 @@
 import numpy as np
+import itertools
 from ..visualisation.visualize import plot as visualize
 
 class Vehicle:
@@ -23,9 +24,6 @@ class Vehicle:
     def change_position(self, new_positions):
         self.positions = new_positions
             
-
-
-
 class Board:
     def __init__(self, size):
         self.vehicles_list = []
@@ -48,7 +46,10 @@ class Board:
             vehicle = Vehicle(length, car['orientation'], (car['col'], car['row']), name, colour)
             self.vehicles_list.append(vehicle)                  
             self.vehicle_position_list.append(vehicle.positions)
-            
+
+        #TODO: unpack lists?
+        # itertools.chain(*self.vehicle_position_list)
+    
 
     # Method to ensure pieces are actually on the board
     def find_vehicle(self, name):
@@ -57,32 +58,34 @@ class Board:
                 return vehicle
         return None
 
+    def position_error(self, vehicle):
+        self.vehicle_position_list.append(vehicle.positions)
+        raise ValueError("New position already occupied")
+    
     def move_piece(self, name, movement):
         # Make sure piece excists
         vehicle = self.find_vehicle(name)
         if vehicle is None:
             raise ValueError("Piece not found")        
 
-
         # vehicles.positions = (col, row)
         # Makes sure the piece stays on the board
         if vehicle.orientation == 'H':
             if movement > 0 and not 0 <= vehicle.positions[-1][1] + movement < self.size:
                 raise ValueError("Position out of bounds")
-            if movement < 0 and not 0 <= vehicle.positions[0][1] + movement < self.size:
+            elif movement < 0 and not 0 <= vehicle.positions[0][1] + movement < self.size:
                 raise ValueError("Position out of bounds")
         else:
             if movement > 0 and not 0 <= vehicle.positions[-1][0] + movement < self.size:
                 raise ValueError("Position out of bounds")
-            if movement < 0 and not 0 <= vehicle.positions[0][0] + movement < self.size:
+            elif movement < 0 and not 0 <= vehicle.positions[0][0] + movement < self.size:
                 raise ValueError("Position out of bounds")
 
         #TODO: what if position is occupied, reset list
-        for position in vehicle.positions:
-            self.vehicle_position_list.remove(position)
-
+        self.vehicle_position_list.remove(vehicle.positions)
+        
         new_positions=[]
-        if vehicle.orientation == 'H':
+        if vehicle.orientation == 'V':
             for position in vehicle.positions:
                 col, row = position
                 new_positions.append((col + movement, row))
@@ -90,21 +93,17 @@ class Board:
             for position in vehicle.positions:
                 col, row = position
                 new_positions.append((col, row + movement))
+
         
         # Check if new position is already occupied
         for position in new_positions:
-            if position in self.vehicle_position_list:
-                position_error(vehicle.positions)
+            for position_list in self.vehicle_position_list:
+                if position in position_list:
+                    self.position_error(vehicle)
         
         # Update positions
         vehicle.change_position(new_positions)
-
-    def position_error(self, old_positions):
-        for old_place in old_positions:
-            self.vehicle_positions.append(old_place)
-        raise ValueError("New position already occupied")
-
-
+        self.vehicle_position_list.append(vehicle.positions)        
 
 
     def print_board(self):
