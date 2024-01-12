@@ -3,22 +3,24 @@ import numpy as np
 
 def plot(vehicles, size):
     data = np.ones((size, size, 3)) 
-
+    
     for vehicle in vehicles:
         a, b = vehicle.position
+
         for i in range(vehicle.length):
+            print(i)
             if vehicle.orientation == 'H':
-                data[a + i][b] = vehicle.colour/250
+                data[a][b + i] = vehicle.colour/255
             else :
-                data[a][b+ i] = vehicle.colour/250
-    data = np.clip(data, 0, 1)
+                data[a + i][b] = vehicle.colour/255
+
     fig, (ax1, ax2) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [10, 1]}, figsize=(10, 5))
 
     # Plot the image with grid on the first subplot
     ax1.imshow(data, interpolation='nearest')
     ax1.grid(axis='both', color='white', linewidth=2)
-    ax1.set_xticks(np.arange(0.5, data.shape[1], 1))
-    ax1.set_yticks(np.arange(0.5, data.shape[0], 1))
+    ax1.set_xticks(np.arange(0.5, size+0.5, 1))
+    ax1.set_yticks(np.arange(0.5, size+0.5, 1))
     ax1.tick_params(bottom=False, top=False, left=False, right=False, labelbottom=False, labelleft=False)
 
     # Create legend with explicit labels on the second subplot

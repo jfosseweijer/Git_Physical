@@ -9,7 +9,7 @@ def main(gameboards):
     assert board_number >= 0 and board_number < len(gameboards), "Invalid board number"
     
     # Create bord class and initiate
-    board = Board(size=gameboards[board_number]['col'].max(axis=0))
+    board = Board()
     board.setup_board(gameboards[board_number])
 
     moved_X = False
