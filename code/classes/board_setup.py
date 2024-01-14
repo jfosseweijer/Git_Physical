@@ -27,8 +27,15 @@ class Vehicle:
 class Board:
     def __init__(self, size):
         self.vehicles_list = []
-        self.vehicle_position_list = []
+        self.nested_vehicle_positions = []
         self.size = size
+
+    def update_positions_set(self, vehicle=False, new_positions=False):
+        if new_positions:
+            self.nested_vehicle_positions.remove(vehicle.positions)
+            self.nested_vehicle_positions.append(new_positions)
+        self.vehicle_position_set = set(itertools.chain(*self.nested_vehicle_positions))    
+
 
     def setup_board(self, gameboard):
         # Set the grid of the board
@@ -45,11 +52,9 @@ class Board:
             # Create vehicle object and add it to the board, n serves as name
             vehicle = Vehicle(length, car['orientation'], (car['col'], car['row']), name, colour)
             self.vehicles_list.append(vehicle)                  
-            self.vehicle_position_list.append(vehicle.positions)
+            self.nested_vehicle_positions.append(vehicle.positions)
 
-        #TODO: unpack lists?
-        # itertools.chain(*self.vehicle_position_list)
-    
+        self.update_positions_set()
 
     # Method to ensure pieces are actually on the board
     def find_vehicle(self, name):
@@ -57,15 +62,10 @@ class Board:
             if vehicle.name == name:
                 return vehicle
         return None
-
-    def position_error(self, vehicle):
-        self.vehicle_position_list.append(vehicle.positions)
-        raise ValueError("New position already occupied")
     
+    #TODO: piece can move down out the box
+    #TODO: get error out
     def move_piece(self, name, movement):
-        #TODO: Vehicles can jump over cars, not only check position but also moving way
-        #TODO: set of vehicles positions 
-        #TODO: intersection vehicle path and vehicle positions set
         # Make sure piece excists
         vehicle = self.find_vehicle(name)
         if vehicle is None:
@@ -73,7 +73,7 @@ class Board:
 
         # vehicles.positions = (col, row)
         # Makes sure the piece stays on the board
-        if vehicle.orientation == 'H':
+        if vehicle.orientation == 'V':
             if movement > 0 and not 0 <= vehicle.positions[-1][1] + movement < self.size:
                 raise ValueError("Position out of bounds")
             elif movement < 0 and not 0 <= vehicle.positions[0][1] + movement < self.size:
@@ -84,29 +84,30 @@ class Board:
             elif movement < 0 and not 0 <= vehicle.positions[0][0] + movement < self.size:
                 raise ValueError("Position out of bounds")
 
-        #TODO: what if position is occupied, reset list
-        self.vehicle_position_list.remove(vehicle.positions)
-        
-        new_positions=[]
         if vehicle.orientation == 'V':
-            for position in vehicle.positions:
-                col, row = position
-                new_positions.append((col + movement, row))
-        else:
-            for position in vehicle.positions:
-                col, row = position
-                new_positions.append((col, row + movement))
+            if movement > 0:
+                route = {(vehicle.positions[-1][0], vehicle.positions[-1][1] + step + 1) for step in range(movement)}
+            else:
+                route = {(vehicle.positions[-1][1], vehicle.positions[0][1] + step + 1) for step in range(movement)}
+            
+            new_positions = [(position[0] + movement, position[1]) for position in vehicle.positions]
 
+        else:
+            if movement > 0:
+                route = {(vehicle.positions[-1][0] + step + 1, vehicle.positions[-1][1]) for step in range(movement)}
+            else:
+                route = {(vehicle.positions[0][0] + step + 1, vehicle.positions[0][1]) for step in range(movement)}
         
+            new_positions = [(position[0], position[1] + movement) for position in vehicle.positions]
+
         # Check if new position is already occupied
-        for position in new_positions:
-            for position_list in self.vehicle_position_list:
-                if position in position_list:
-                    self.position_error(vehicle)
-        
+        if route & self.vehicle_position_set:
+            print("hier")
+            raise ValueError("New position already occupied")
+
         # Update positions
-        vehicle.change_position(new_positions)
-        self.vehicle_position_list.append(vehicle.positions)        
+        vehicle.positions = new_positions
+        self.update_positions_set(vehicle, new_positions)   
 
 
     def print_board(self):
