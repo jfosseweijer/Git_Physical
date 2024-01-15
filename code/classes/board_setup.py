@@ -3,54 +3,54 @@ import itertools
 from ..visualisation.visualize import plot as visualize
 
 class Vehicle:
-    def __init__(self, length, orientation, position, name, colour='white'):
+    def __init__(self, length, orientation, col, row, name, colour='white'):
+        """
+        Creates a vehicle object
+        """
         self.length = int(length)
         self.orientation = orientation
         self.name = name
         self.colour = colour
-        self.set_positions(position)
+        self.set_positions((col, row))
 
     def set_positions(self, position):
-        row, col = position
-
-        col -= 1
-        row -= 1
-        
+        """
+        Set a vehicles coordinates
+        """      
         if self.orientation == 'H':
-            self.positions = [(col, row + i) for i in range(self.length + 1)]
+            self.positions = [(position[0] + i - 1, position[1] - 1) for i in range(self.length)]
         else:
-            self.positions = [(col + i, row) for i in range(self.length + 1)]
+            self.positions = [(position[0] - 1, position[1] + i - 1) for i in range(self.length)]
 
     def change_position(self, new_positions):
+        """
+        Updates a vehicles position
+        """
         self.positions = new_positions
             
 class Board:
     def __init__(self, size):
+        """
+        Sets board parameters
+        """
         self.vehicles_list = []
         self.nested_vehicle_positions = []
         self.size = size
 
-    def update_positions_set(self, vehicle=False, new_positions=False):
-        if new_positions:
-            self.nested_vehicle_positions.remove(vehicle.positions)
-            self.nested_vehicle_positions.append(new_positions)
-        self.vehicle_position_set = set(itertools.chain(*self.nested_vehicle_positions))    
-
-
     def setup_board(self, gameboard):
         # Set the grid of the board
-        for name, car in gameboard.iterrows():
+        for index, (name, car) in enumerate(gameboard.iterrows()):
             # Set length to be an int instead of string
-            length = int(car['length']) - 1
+            length = int(car['length'])
 
             if name == 'X':
-                colour = np.array([255, 0, 0])
+                colour = np.array([1, 0, 0])
+                self.exit = (car['row'] - 1, self.size - 1)
             else:
-                # Random rgb colour
-                colour = np.random.choice(range(256), size=3)
+                colour = self.create_colours(index)
 
             # Create vehicle object and add it to the board, n serves as name
-            vehicle = Vehicle(length, car['orientation'], (car['col'], car['row']), name, colour)
+            vehicle = Vehicle(length, car['orientation'], car['col'], car['row'], name, colour)
             self.vehicles_list.append(vehicle)                  
             self.nested_vehicle_positions.append(vehicle.positions)
 
@@ -63,63 +63,77 @@ class Board:
                 return vehicle
         return None
     
-    #TODO: piece can move down out the box
-    #TODO: get error out
     def move_piece(self, name, movement):
         # Make sure piece excists
         vehicle = self.find_vehicle(name)
         if vehicle is None:
             raise ValueError("Piece not found")        
 
-        # vehicles.positions = (col, row)
         # Makes sure the piece stays on the board
-        if vehicle.orientation == 'V':
-            if movement > 0 and not 0 <= vehicle.positions[-1][1] + movement < self.size:
-                raise ValueError("Position out of bounds")
-            elif movement < 0 and not 0 <= vehicle.positions[0][1] + movement < self.size:
-                raise ValueError("Position out of bounds")
-        else:
-            if movement > 0 and not 0 <= vehicle.positions[-1][0] + movement < self.size:
-                raise ValueError("Position out of bounds")
-            elif movement < 0 and not 0 <= vehicle.positions[0][0] + movement < self.size:
-                raise ValueError("Position out of bounds")
-
-        if vehicle.orientation == 'V':
-            if movement > 0:
-                route = {(vehicle.positions[-1][0], vehicle.positions[-1][1] + step + 1) for step in range(movement)}
-            else:
-                route = {(vehicle.positions[-1][1], vehicle.positions[0][1] + step + 1) for step in range(movement)}
-            
-            new_positions = [(position[0] + movement, position[1]) for position in vehicle.positions]
-
-        else:
-            if movement > 0:
-                route = {(vehicle.positions[-1][0] + step + 1, vehicle.positions[-1][1]) for step in range(movement)}
-            else:
-                route = {(vehicle.positions[0][0] + step + 1, vehicle.positions[0][1]) for step in range(movement)}
-        
-            new_positions = [(position[0], position[1] + movement) for position in vehicle.positions]
+        self.check_boundries(vehicle, movement)
+        route, new_positions = self.make_path(vehicle, movement)
 
         # Check if new position is already occupied
         if route & self.vehicle_position_set:
-            print("hier")
             raise ValueError("New position already occupied")
 
         # Update positions
-        vehicle.positions = new_positions
-        self.update_positions_set(vehicle, new_positions)   
+        self.update_positions_set(vehicle, new_positions)
+    
+    def check_boundries(self, vehicle, movement):
+        if vehicle.orientation == 'H':
+            print(vehicle.positions)
+            if movement > 0 and not vehicle.positions[-1][0] + movement < self.size:
+                raise ValueError("Position out of right bounds")
+            elif movement < 0 and not 0 <= vehicle.positions[0][0] + movement:
+                raise ValueError("Position out of left bounds")
+        else:
+            if movement > 0 and not vehicle.positions[-1][1] + movement < self.size:
+                raise ValueError("Position out of top bounds")
+            elif movement < 0 and not 0 <= vehicle.positions[0][1] + movement:
+                raise ValueError("Position out of bottom bounds")
+            
+    def make_path(self, vehicle, movement):
+        if vehicle.orientation == 'H':
+            if movement > 0:
+                route = {(vehicle.positions[-1][0] + step, vehicle.positions[-1][1]) for step in range(1, movement + 1)}
+            else:
+                route = {(vehicle.positions[0][0] + step, vehicle.positions[0][1]) for step in range(movement, 0)}
+            
+            final_positions = [(position[0] + movement, position[1]) for position in vehicle.positions]
 
+        else:
+            if movement > 0:
+                route = {(vehicle.positions[-1][0], vehicle.positions[-1][1] + step) for step in range(1,movement+1)}
+            else:
+                route = {(vehicle.positions[0][0], vehicle.positions[0][1] + step) for step in range(movement, 0)}
+            
+            final_positions = [(position[0], position[1] + movement) for position in vehicle.positions]
+
+        print(route, final_positions)
+        return route, final_positions
+
+    def update_positions_set(self, vehicle=False, new_positions=False):
+        if new_positions:
+            self.nested_vehicle_positions.remove(vehicle.positions)
+            self.nested_vehicle_positions.append(new_positions)
+            vehicle.change_position(new_positions)
+        self.vehicle_position_set = set(itertools.chain(*self.nested_vehicle_positions))
 
     def print_board(self):
         """ 
         Prints the board in a neat format.
         """
-        visualize(self.vehicles_list, self.size)
+        visualize(self.vehicles_list, self.size, self.exit)
 
     def is_won(self):
         red_car = self.find_vehicle('X')
 
-        if red_car.positions[-1][1] >= self.size:
+        if red_car.positions[-1][0] >= self.exit[0]:
             return True
         else:
             return False
+
+    def create_colours(self, index):
+        self.colours = [[0, 1, 0], [0, 0, 1], [1, 1, 0], [0, 1, 1], [1, 0, 1], [1, 0.5, 0], [0.5, 0, 1], [0.5, 1, 0], [0, 0.5, 0.5], [1, 0.5, 0.5], [0.5, 0.25, 0], [0.8, 0.8, 0.8],  [0.2, 0.2, 0.2], [0.6, 0.3, 0.1],  [0.7, 0.5, 0.2], [0.4, 0.8, 0.2], [0, 0.8, 0.8], [0.8, 0.2, 0.2], [0.5, 0.5, 1], [0.9, 0.9, 0], [0.3, 0.5, 0.7],  [0.4, 0.6, 0.2], [0.7, 0.2, 0.7], [0.6, 0.8, 0.9], [0.8, 0.4, 0.8], [0.9, 0.6, 0.4], [0.1, 0.3, 0.6], [0.7, 0.5, 0.8], [0.4, 0.1, 0.4], [0.9, 0.9, 0.5], [0.6, 0.6, 0.6], [0.1, 0.5, 0.3], [0.9, 0.2, 0.5], [0.8, 0.7, 0.1], [0.2, 0.7, 0.4], [0.5, 0.5, 0.7], [0.7, 0.5, 0.5], [0.4, 0.2, 0.6], [0.8, 0.3, 0.3], [0.4, 0.8, 0.7],  [0.8, 0.6, 0.2], [0.1, 0.6, 0.3], [0.9, 0.4, 0.6],[0.3, 0.1, 0.8],[0.5, 0.7, 0.9],]
+        return self.colours[index]

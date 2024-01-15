@@ -5,9 +5,13 @@ from code.classes.board_setup import Vehicle as Vehicle
 from code.classes.board_setup import Board as Board
 
 def main(gameboards):
-    board_number = int(input(f"Which board do you want to play 1-{len(gameboards)}?  ")) - 1
-    assert board_number >= 0 and board_number < len(gameboards), "Invalid board number"
-    
+    board_number = None
+    while board_number is None or board_number < 0 or board_number >= len(gameboards) + 1:
+        try:
+            board_number = int(input(f"Which board do you want to play, choose between 1-{len(gameboards) + 1}? ")) - 1
+        except ValueError:
+            print("Invalid input. Please enter a valid integer.")
+
     # Create bord class and initiate
     board = Board(gameboards[board_number][1])
     board.setup_board(gameboards[board_number][0])
@@ -42,7 +46,8 @@ def main(gameboards):
             if valid_move == True:
                 try:
                     board.move_piece(car_name, movement)
-                except ValueError:
+                except ValueError as e:
+                    print(e)
                     valid_move = False
                     print(f"You can't move {car_name} by {movement}")
 
