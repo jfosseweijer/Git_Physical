@@ -46,4 +46,4 @@ def plot(vehicles, size, exit):
     plt.tight_layout()
 
     # Show the figure
-    plt.show()
+    plt.savefig("visualize.png")

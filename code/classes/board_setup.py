@@ -85,7 +85,7 @@ class Board:
         self.update_positions_set()
 
     # Method to ensure pieces are actually on the board
-    def find_vehicle(self, name):
+    def find_vehicle(self, name, user=False):
         """
         Finds a vehicle by its name.
 
@@ -101,7 +101,7 @@ class Board:
                 return vehicle
         return None
     
-    def move_piece(self, name, movement):
+    def move_piece(self, name, movement, user):
         """
         Moves a vehicle on the board.
 
@@ -123,8 +123,9 @@ class Board:
         if route & self.vehicle_position_set:
             raise ValueError("New position already occupied")
 
-        # Update positions
-        self.update_positions_set(vehicle, new_positions)
+        if user:
+            # Update positions
+            self.update_positions_set(vehicle, new_positions)
     
     def check_boundries(self, vehicle, movement):
         """
@@ -204,7 +205,6 @@ class Board:
         Returns:
         - bool: True if the player has won, False otherwise.
         """
-
         iterations = 0
         while not self.is_won() and iterations < 1000:
             iterations += 1
@@ -222,7 +222,8 @@ class Board:
     
         red_car = self.find_vehicle('X')
 
-        if red_car.positions[-1][0] >= self.exit[0]:
+        if red_car.positions[-1][0] == self.exit[1]:
+            self.print_board()
             return True
         else:
             return False

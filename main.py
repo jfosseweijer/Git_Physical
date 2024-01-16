@@ -18,23 +18,31 @@ def main(gameboards):
 
 
     winner = False
-    while winner == False:
+    while not winner:
         car = None
         valid_move = False
         while valid_move == False:
             board.print_board()
             player_move = input("Enter the car and it's movement: ")
             player_move = player_move.split(',')
-        
-            if len(player_move) == 2:
-                car_name = player_move[0].upper()
-                movement = int(player_move[1])
+            try:
+                player_move = player_move.split(',')
                 valid_move = True
+            except ValueError:
+                valid_move = False
+                
+            if len(player_move) == 2 and valid_move and len(player_move[1]) != 0 :
+                car_name = player_move[0].upper()
+                try:
+                    movement = int(player_move[1])
+                    valid_move = True
+                except ValueError:
+                    valid_move = False
 
-            else:
+            if not valid_move:
                 player_move = print("Please use this format (A,1): ")
 
-            if valid_move == True:
+            if valid_move:
                 # Find the car and print its current position
                 car = board.find_vehicle(car_name)
 
@@ -43,9 +51,9 @@ def main(gameboards):
                     valid_move = False
 
             # Check if input syntax is correct
-            if valid_move == True:
+            if valid_move:
                 try:
-                    board.move_piece(car_name, movement)
+                    board.move_piece(car_name, movement, user=True)
                 except ValueError as e:
                     print(e)
                     valid_move = False
