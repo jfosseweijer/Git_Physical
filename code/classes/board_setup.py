@@ -85,7 +85,7 @@ class Board:
         self.update_positions_set()
 
     # Method to ensure pieces are actually on the board
-    def find_vehicle(self, name, user=False):
+    def find_vehicle(self, name):
         """
         Finds a vehicle by its name.
 
@@ -101,7 +101,7 @@ class Board:
                 return vehicle
         return None
     
-    def move_piece(self, name, movement, user):
+    def move_piece(self, name, movement, user_input):
         """
         Moves a vehicle on the board.
 
@@ -123,7 +123,7 @@ class Board:
         if route & self.vehicle_position_set:
             raise ValueError("New position already occupied")
 
-        if user:
+        if user_input:
             # Update positions
             self.update_positions_set(vehicle, new_positions)
     
@@ -199,18 +199,13 @@ class Board:
         visualize(self.vehicles_list, self.size, self.exit)
 
     def random_solve(self):
-        """
-        Checks if the player has won the game.
-
-        Returns:
-        - bool: True if the player has won, False otherwise.
-        """
         iterations = 0
         while not self.is_won() and iterations < 1000:
             iterations += 1
             movement = random_step(self)
-            self.move_piece(movement[0], movement[1])
-        pass
+            self.make_path(movement[0], movement[1])
+            self.update_positions_set()
+            #self.print_board()
 
     def is_won(self):
         """

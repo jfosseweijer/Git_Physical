@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
 import os
+import argparse
 from code.classes.board_setup import Vehicle as Vehicle
 from code.classes.board_setup import Board as Board
 
-def main(gameboards):
+def main(gameboards, user_input, random_solver):
     board_number = None
     while board_number is None or board_number < 0 or board_number >= len(gameboards) + 1:
         try:
@@ -18,7 +19,7 @@ def main(gameboards):
 
 
     winner = False
-    while not winner:
+    while not winner and user_input:
         car = None
         valid_move = False
         while valid_move == False:
@@ -53,7 +54,7 @@ def main(gameboards):
             # Check if input syntax is correct
             if valid_move:
                 try:
-                    board.move_piece(car_name, movement, user=True)
+                    board.move_piece(car_name, movement, user_input)
                 except ValueError as e:
                     print(e)
                     valid_move = False
@@ -61,6 +62,9 @@ def main(gameboards):
 
         if car_name == 'X':
             winner = board.is_won()
+
+    if random_solver:
+        board.random_solve()
 
     print("You smart boiii!!!")
 
@@ -79,5 +83,16 @@ def open_gameboards():
 
 if __name__ == "__main__":
     gameboards = open_gameboards()
-    main(gameboards)
-    
+
+    # Set-up parsing command line arguments
+    parser = argparse.ArgumentParser(description = "Rush Hour game, either play the game or solve it using an algorithm.")
+
+    # Adding arguments
+    parser.add_argument("-u" ,"--user_input", action='store_true', help="set this flag to True, allowing the user to play the game")
+    parser.add_argument("-r", "--random_solve", action='store_true', help="set this flag to True, game will be solved using a random moves algorithm")
+
+    # Read arguments from command line
+    args = parser.parse_args()
+
+    # Run main with provided arguments
+    main(gameboards, **args)
