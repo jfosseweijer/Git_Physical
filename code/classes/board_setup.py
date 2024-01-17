@@ -1,5 +1,6 @@
 import numpy as np
 import itertools
+import time
 from ..visualisation.visualize import plot as visualize
 from ..algorithms.randomise import random_step
 
@@ -101,7 +102,7 @@ class Board:
                 return vehicle
         return None
     
-    def move_piece(self, name, movement, user_input):
+    def move_piece(self, name, movement, user_input=False):
         """
         Moves a vehicle on the board.
 
@@ -113,6 +114,7 @@ class Board:
         # Make sure piece excists
         vehicle = self.find_vehicle(name)
         if vehicle is None:
+            print(f"Vehicle {name.name} not found")
             raise ValueError("Piece not found")        
 
         # Makes sure the piece stays on the board
@@ -126,6 +128,8 @@ class Board:
         if user_input:
             # Update positions
             self.update_positions_set(vehicle, new_positions)
+        else: 
+            return new_positions
     
     def check_boundries(self, vehicle, movement):
         """
@@ -137,7 +141,7 @@ class Board:
         """
 
         if vehicle.orientation == 'H':
-            print(vehicle.positions)
+            #print(vehicle.positions)
             if movement > 0 and not vehicle.positions[-1][0] + movement < self.size:
                 raise ValueError("Position out of right bounds")
             elif movement < 0 and not 0 <= vehicle.positions[0][0] + movement:
@@ -176,7 +180,7 @@ class Board:
             
             final_positions = [(position[0], position[1] + movement) for position in vehicle.positions]
 
-        print(route, final_positions)
+        #print(route, final_positions)
         return route, final_positions
 
     def update_positions_set(self, vehicle=False, new_positions=False):
@@ -200,12 +204,18 @@ class Board:
 
     def random_solve(self):
         iterations = 0
-        while not self.is_won() and iterations < 1000:
+        while not self.is_won():
+            self.print_board()
             iterations += 1
-            movement = random_step(self)
-            self.make_path(movement[0], movement[1])
-            self.update_positions_set()
-            #self.print_board()
+            name, movement, position = random_step(self)
+            vehicle = self.find_vehicle(name)
+            self.update_positions_set(vehicle, position)
+            time.sleep(0.2)
+            print(name, movement)
+            if iterations == 100:
+                print("No solution found")
+                break
+        
 
     def is_won(self):
         """
@@ -219,6 +229,7 @@ class Board:
 
         if red_car.positions[-1][0] == self.exit[1]:
             self.print_board()
+            print("You smart boiii!!!")
             return True
         else:
             return False

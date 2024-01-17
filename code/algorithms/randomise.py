@@ -16,23 +16,32 @@ def random_step(board):
     """
     Randomly select a step that is valid.
     """
-    possible_moves = {}
+    options = {}
     # For each vehicle on the board, check if it can move
     for vehicle in board.vehicles_list:
-        possible_moves[vehicle.name] = []
-        for move in range(1, board.size):
-            for direction in [-move, move]:
+        possible_moves = []
+
+        for direction in [-1, 1]:
+            move = 1
+            stuck = False
+            
+            while move < board.size and not stuck:
                 try:
-                    board.move_piece(vehicle, direction)
-                    possible_moves[vehicle.name].append(direction)
+                    new_positions = board.move_piece(vehicle.name, move * direction)
+                    possible_moves.append((move * direction, new_positions))
+                    move += 1
+
                 except ValueError:
-                    pass
-
-    if len(possible_moves) == 0:
+                    stuck = True
+            
+            if possible_moves:
+                options[vehicle.name] = possible_moves
+                
+    if len(options) == 0:
         raise ValueError("No possible moves found")
-
+    
     # Select a random vehicle and a random move
-    vehicle = random.choice(list(possible_moves.keys()))
-    movement = random.choice(possible_moves[vehicle])
+    vehicle = random.choice(list(options.keys()))
+    movement, position = random.choice(options[vehicle])
 
-    return vehicle, movement
+    return vehicle, movement, position

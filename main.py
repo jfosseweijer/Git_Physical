@@ -25,7 +25,6 @@ def main(gameboards, user_input, random_solver):
         while valid_move == False:
             board.print_board()
             player_move = input("Enter the car and it's movement: ")
-            player_move = player_move.split(',')
             try:
                 player_move = player_move.split(',')
                 valid_move = True
@@ -66,7 +65,6 @@ def main(gameboards, user_input, random_solver):
     if random_solver:
         board.random_solve()
 
-    print("You smart boiii!!!")
 
 def open_gameboards():
     # Saves the boards in a list. 
@@ -95,4 +93,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Run main with provided arguments
-    main(gameboards, **args)
+    main(gameboards, args.user_input, args.random_solve)
