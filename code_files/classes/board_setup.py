@@ -1,9 +1,10 @@
 import numpy as np
 import itertools
 import time
+from ..classes.history import Queue as Queue
 from ..visualisation.visualize import plot as visualize
 from ..algorithms.randomise import random_step
-from queue import Queue
+
 
 class Vehicle:
     def __init__(self, length, orientation, col, row, name, colour='white'):
@@ -206,16 +207,25 @@ class Board:
     def random_solve(self):
         iterations = 0
         history = Queue()
-        while not self.is_won() and iterations < 100:
+        while not self.is_won() and iterations < 1:
+            if history.size() > 5:
+                history.dequeue()
             self.print_board()
             iterations += 1
             name, movement, position = random_step(self)
-            if movement != -abs(history[-1][1]):
-                history.enqueue((name, movement, position))
+            try:
+                last_move = history.peek_back()
+            except AssertionError:
+                last_move = (None, 0, None)
+            if movement == -abs(last_move[1]) and name == last_move[0]:
+                print(f"Reverse movement {name} by {movement}")
+            else:
                 vehicle = self.find_vehicle(name)
                 self.update_positions_set(vehicle, position)
+                history.enqueue((name, movement, position))
                 time.sleep(0.2)
                 print(name, movement)
+                
         
         if self.is_won():
             print(f"Game is won in {iterations} moves")

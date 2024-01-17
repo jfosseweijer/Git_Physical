@@ -6,7 +6,7 @@ Author: Nanne Hempel
 """
 import random
 import pandas as pd
-from ..classes.queue import Queue
+from ..classes.history import Queue
 
 def generate_random_board(board):
     """

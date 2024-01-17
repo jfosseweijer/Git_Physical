@@ -1,4 +1,3 @@
-x = -2
-
-for i in range(x):
-    print(i)
+x = "ab"
+y = int(x)
+print(y)

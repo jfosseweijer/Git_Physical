@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 import os
 import argparse
-from code.classes.board_setup import Vehicle as Vehicle
-from code.classes.board_setup import Board as Board
+from code_files.classes.board_setup import Vehicle as Vehicle
+from code_files.classes.board_setup import Board as Board
 
 def main(gameboards, user_input, random_solver):
     board_number = None

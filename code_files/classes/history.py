@@ -1,10 +1,9 @@
-class Queue:
-
+class Queue(object):
     def __init__(self):
         self._data = []
 
     # add element to back of queue
-    def enqueue(self, element) -> None:
+    def enqueue(self, element):
         self._data.append(element)
 
     # remove and return element from front of queue
@@ -21,6 +20,7 @@ class Queue:
         return self._data[0]
     
     def peek_back(self):
+        assert self.size() > 0
         return self._data[-1]
     
     # empties the queue

@@ -46,4 +46,4 @@ def plot(vehicles, size, exit):
     plt.tight_layout()
 
     # Show the figure
-    plt.savefig("interface.png")
+    plt.savefig("game8.png")
