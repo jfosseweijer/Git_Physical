@@ -203,6 +203,9 @@ class Board:
         """Prints the board in a neat format."""
 
         visualize(self.vehicles_list, self.size, self.exit)
+    
+    def plot_information(self):
+        return self.vehicles_list, self.size, self.exit
 
     def random_solve(self):
         iterations = 0
