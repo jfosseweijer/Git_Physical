@@ -3,6 +3,7 @@ import itertools
 import time
 from ..visualisation.visualize import plot as visualize
 from ..algorithms.randomise import random_step
+from queue import Queue
 
 class Vehicle:
     def __init__(self, length, orientation, col, row, name, colour='white'):
@@ -204,17 +205,23 @@ class Board:
 
     def random_solve(self):
         iterations = 0
-        while not self.is_won():
+        history = Queue()
+        while not self.is_won() and iterations < 100:
             self.print_board()
             iterations += 1
             name, movement, position = random_step(self)
-            vehicle = self.find_vehicle(name)
-            self.update_positions_set(vehicle, position)
-            time.sleep(0.2)
-            print(name, movement)
-            if iterations == 100:
-                print("No solution found")
-                break
+            if movement != -abs(history[-1][1]):
+                history.enqueue((name, movement, position))
+                vehicle = self.find_vehicle(name)
+                self.update_positions_set(vehicle, position)
+                time.sleep(0.2)
+                print(name, movement)
+        
+        if self.is_won():
+            print(f"Game is won in {iterations} moves")
+        else:
+            print(f"Game not solved after {iterations} moves")
+            
         
 
     def is_won(self):
@@ -229,7 +236,6 @@ class Board:
 
         if red_car.positions[-1][0] == self.exit[1]:
             self.print_board()
-            print("You smart boiii!!!")
             return True
         else:
             return False

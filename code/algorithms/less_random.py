@@ -6,40 +6,16 @@ Author: Nanne Hempel
 """
 import random
 import pandas as pd
-import string
+from ..classes.queue import Queue
 
-def generate_random_board(size, num_cars):
+def generate_random_board(board):
     """
     Generates a random board. Fingers crossed it's solvable.
     """
     # Create a list of all possible positions on the board
-    positions = [(row, column) for row in range(size) for column in range(size)]
-    # Define the number of rows you want in your DataFrame
-    num_rows = 100
+    positions = [(row, column) for row in range(board.size) for column in range(board.size)]
 
-    # Define the possible values for each column
-    cars = list(string.ascii_uppercase)
-    orientations = ['H', 'V']
-    positions = list(range(size)) 
-    lengths = [2, 3]
 
-    # Always include 'X' car with length 2
-    data = [('X', random.choice(orientations), random.choice(positions), random.choice(positions), 2)]
-
-    # Generate the rest of the data
-    for _ in range(num_rows - 1):
-        car = random.choice(cars)
-        orientation = random.choice(orientations)
-        col = random.choice(positions)
-        row = random.choice(positions)
-        length = 2 if car == 'X' else random.choice(lengths)
-        data.append((car, orientation, col, row, length))
-
-    # Create a DataFrame from the data
-    df = pd.DataFrame(data, columns=['car', 'orientation', 'col', 'row', 'length'])
-
-    # Write the DataFrame to a CSV file
-    df.to_csv('output.csv', index=False)
     return
 
 def random_step(board):

@@ -65,6 +65,9 @@ def main(gameboards, user_input, random_solver):
     if random_solver:
         board.random_solve()
 
+    if board.is_won():
+        print("You smart boiii!!!")
+
 
 def open_gameboards():
     # Saves the boards in a list. 
@@ -93,4 +96,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Run main with provided arguments
-    main(gameboards, args.user_input, args.random_solve)
+    if not args.user_input and not args.random_solve:
+        print("Usage:'main.py -r' or '-u'")
+    else:
+        main(gameboards, args.user_input, args.random_solve)
