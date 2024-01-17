@@ -21,7 +21,6 @@ def open_gameboards():
         gameboards.append((board_df, size))
     return gameboards
 
-
 if __name__ == "__main__":
     gameboards = open_gameboards()
     main(gameboards)

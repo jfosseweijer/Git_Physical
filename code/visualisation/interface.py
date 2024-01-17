@@ -23,12 +23,16 @@ class Interface:
         # Add options
         images = ["game 1", "game 2", "game 3", "game 4", "game 5", "game 6", "game 7", "game 8"]
 
-        # Coupple the corresponding game visualisation
+        # Couple the corresponding game visualization
         image_menu = ttk.Combobox(master=self.master, textvariable=self.image_var, values=images)
         image_menu.pack(pady=10)
+        image_menu.bind("<<ComboboxSelected>>", self.load_image)
         board_number = int(image_menu.get()[-1])
-        path = f"game {board_number}.png"
-        image_menu.bind("<<ComboboxSelected>>", self.load_image(path))
+        # Create the label for the image once during initialization
+        self.image_label = tk.Label(self.master)
+        self.image_label.pack()
+        # Manually load the initial image
+        self.load_image()  
 
         # Buttons for different functionalities
         user_button = ttk.Button(master=self.master, text="User", command=lambda: self.create_user(board_number))
@@ -39,7 +43,6 @@ class Interface:
 
         algorithm_button = ttk.Button(master=self.master, text="Algorithm", command=lambda: self.create_Algorithm(board_number))
         algorithm_button.pack(side=tk.BOTTOM, fill=tk.X)
-
 
     def create_user(self, board_number):
         self.clear_interface()
@@ -104,8 +107,6 @@ class Interface:
             #             print(f"You can't move {car_name} by {movement}")
 
 
-
-
     def create_random(self):
         self.clear_interface()
         self.master.title("user")
@@ -114,13 +115,17 @@ class Interface:
         self.clear_interface()
         self.master.title("user")
 
+    def load_image(self, event=None):
+        # Use self.image_var.get() to get the selected value
+        board_number = int(self.image_var.get()[-1])
+        path = f"data\\gameboards_start_layout\\game{board_number}.png"
 
-    def load_image(self, image_path):
-        image = Image.open(image_path)
+        image = Image.open(path)
         image = image.resize((600, 300))
         self.photo = ImageTk.PhotoImage(image)
-        label = tk.Label(self.master, image=self.photo)
-        label.pack()
+
+        # Update the image of the existing label
+        self.image_label.config(image=self.photo)
 
     
     def plot(self, vehicles, size, exit):
