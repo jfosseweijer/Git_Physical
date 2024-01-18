@@ -26,14 +26,13 @@ for filename in os.listdir(csv_dir):
 
         # Find the position and value of the peak
         peak_position = kde_values.argmax()
-        peak_value = kde_values[peak_position]
 
         plt.title(f'Histogram for {filename}')
         plt.xlabel('Value')
         plt.ylabel('Density')
 
         # Display peak position and value
-        plt.annotate(f'Peak: {peak_position:.2f}, Value: {peak_value:.2f}', xy=(0.7, 0.9), xycoords='axes fraction', fontsize=10, color='green')
+        plt.annotate(f'Peak: {peak_position:.2f}', xy=(0.7, 0.9), xycoords='axes fraction', fontsize=10, color='green')
 
         save_path = os.path.join(csv_dir[:-13], f'graphs\plot_{filename[:-4]}.png')
         plt.savefig(save_path)
