@@ -18,6 +18,9 @@ for filename in os.listdir(csv_dir):
         file_path = os.path.join(csv_dir, filename)
         data = pd.read_csv(file_path)
 
+        # Clear the figure
+        plt.clf()
+
         # Create a histogram with KDE
         sns.histplot(data['unique states after 1000 moves'], kde=True)
 
@@ -36,3 +39,4 @@ for filename in os.listdir(csv_dir):
 
         save_path = os.path.join(csv_dir[:-13], f'graphs\plot_{filename[:-4]}.png')
         plt.savefig(save_path)
+
