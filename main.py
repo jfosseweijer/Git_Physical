@@ -7,9 +7,9 @@ from code_files.classes.board_setup import Board as Board
 
 def main(gameboards, user_input, random_solver):
     board_number = None
-    while board_number is None or board_number < 0 or board_number >= len(gameboards) + 1:
+    while board_number is None or board_number < 0 or board_number >= len(gameboards):
         try:
-            board_number = int(input(f"Which board do you want to play, choose between 1-{len(gameboards) + 1}? ")) - 1
+            board_number = int(input(f"Which board do you want to play, choose between 1-{len(gameboards)}? ")) - 1
         except ValueError:
             print("Invalid input. Please enter a valid integer.")
 
@@ -63,7 +63,16 @@ def main(gameboards, user_input, random_solver):
             winner = board.is_won()
 
     if random_solver:
-        board.random_solve()
+        results = []
+
+        for game in range(1000):
+            print(game / 1000)
+
+            unique_states = len(board.random_solve())
+            results.append({'game': game, 'unique states after 1000 moves': unique_states})
+
+        data = pd.DataFrame(results)
+        data.to_csv('output_file.csv', index=False)
 
     if board.is_won():
         print("You smart boiii!!!")

@@ -28,9 +28,11 @@ class Interface:
         image_menu.pack(pady=10)
         image_menu.bind("<<ComboboxSelected>>", self.load_image)
         board_number = int(image_menu.get()[-1])
+
         # Create the label for the image once during initialization
         self.image_label = tk.Label(self.master)
         self.image_label.pack()
+        
         # Manually load the initial image
         self.load_image()  
 
