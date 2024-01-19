@@ -6,6 +6,9 @@ from ttkthemes import ThemedStyle
 from PIL import Image, ImageTk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from code_files.classes.board_setup import Board as Board
+from ..algorithms.randomise import random_step
+import time
+
 
 class Interface:
     def __init__(self, master, gameboards):
@@ -75,7 +78,7 @@ class Interface:
 
     def move_car(self):
         # Clear previous error labels
-        self.clear_error_labels()
+        self.clear_labels()
 
         move = self.input_var.get()
 
@@ -84,13 +87,13 @@ class Interface:
             car_name, movement = map(str.strip, move.split(','))
             movement = int(movement)
         except ValueError:
-            self.display_error("Please use this format 'A,1'")
+            self.display_text("Please use this format 'A,1'", error=True)
             return
 
         # Find the car and handle invalid car name
         car = self.board.find_vehicle(car_name.upper())
         if car is None:
-            self.display_error(f"No car named {car_name} found on the board")
+            self.display_text(f"No car named {car_name} found on the board", error=True)
             return
 
         # Try to move the piece and handle invalid moves
@@ -99,30 +102,56 @@ class Interface:
             vehicles, size, exit = self.board.plot_information()
             self.plot(vehicles, size, exit)
         except ValueError as e:
-            self.display_error(str(e))
+            self.display_text(str(e), error=True)
 
         self.check_winner(car_name)
         
-    def display_error(self, error_message):
-        # Clear previous error labels, if any
-        for widget in self.master.winfo_children():
-            if isinstance(widget, tk.Label) and widget.cget("fg") == "red":
-                widget.destroy()
-
+    def display_text(self, text_message, error=False, move=False):
         # Display the error message in the Tkinter interface using Label
-        error_label = tk.Label(self.master, text=f"Error: {error_message}", fg="red")
-        error_label.pack()
+        if error:
+            error_label = tk.Label(self.master, text=f"Error: {text_message}", fg="red")
+            error_label.pack()
+        elif move:
+            move_label = tk.Label(self.master, text=f"Moved: {text_message}", fg="blue")
+            move_label.pack()
 
-    def clear_error_labels(self):
+    def clear_labels(self):
         # Clear all existing error labels
         for widget in self.master.winfo_children():
             if isinstance(widget, tk.Label) and widget.cget("fg") == "red":
                 widget.destroy()
+            if isinstance(widget, tk.Label) and widget.cget("fg") == "blue":
+                widget.destroy()
+                break
 
-    def create_random(self):
+    def create_random(self, board_number):
         self.clear_interface()
-        self.master.title("user")
-    
+        self.master.title("random")
+        
+        self.fig, (self.ax1, self.ax2) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [10, 1]}, figsize=(10, 5))
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.master)
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        
+        # Create an instance of the Board class
+        self.board = Board(self.gameboards[board_number][1])
+        self.board.setup_board(self.gameboards[board_number][0])
+        
+        iterations = 0
+        is_won = False
+        while not is_won and iterations < 100:
+            if iterations > 10:
+                self.clear_labels()
+            vehicles_list, size, exit = self.board.plot_information()
+            self.plot(vehicles_list, size, exit)
+            iterations += 1
+            name, movement, position = random_step(self.board)
+            vehicle = self.board.find_vehicle(name)
+            self.board.update_positions_set(vehicle, position)
+            time.sleep(0.2)
+            self.display_text((name, movement), move=True)
+            self.check_winner(name)
+            
+            
     def create_Algorithm(self):
         self.clear_interface()
         self.master.title("user")
@@ -191,8 +220,6 @@ class Interface:
 
 
     def check_winner(self, car_name):
-        print(car_name)
-
         if car_name == 'X' or car_name == 'x':
             if self.board.is_won():
                 self.clear_interface()

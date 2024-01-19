@@ -5,7 +5,7 @@ import tkinter as tk
 
 def main(gameboards):
     root = tk.Tk()
-    plotting_interface = Interface(root, gameboards)
+    Interface(root, gameboards)
     root.mainloop()
 
 def open_gameboards():

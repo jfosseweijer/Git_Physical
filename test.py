@@ -1,3 +1,2 @@
-x = "ab"
-y = int(x)
-print(y)
+x=100
+print(x%10)
