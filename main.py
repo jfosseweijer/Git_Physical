@@ -6,7 +6,7 @@ from code_files.classes.board_setup import Vehicle as Vehicle
 from code_files.classes.board_setup import Board as Board
 from code_files.algorithms.user import user_move as user_move
 
-def main(gameboards, user_input, random_solver):
+def main(gameboards, user_input, random_solver, no_reverse_solver):
     board_number = None
 
     while board_number is None or board_number < 0 or board_number >= len(gameboards):
@@ -24,6 +24,9 @@ def main(gameboards, user_input, random_solver):
 
     if random_solver:
         board.random_solve()
+
+    if no_reverse_solver:
+        board.no_reverse_solve
 
     if board.is_won():
         print("You smart boiii!!!")
@@ -51,12 +54,13 @@ if __name__ == "__main__":
     # Adding arguments
     parser.add_argument("-u" ,"--user_input", action='store_true', help="set this flag to True, allowing the user to play the game")
     parser.add_argument("-r", "--random_solve", action='store_true', help="set this flag to True, game will be solved using a random moves algorithm")
+    parser.add_argument("-lr", "--no_reverse_solve", action='store_true', help="set this flag to True, game will be solved using a random moves algorithm while not allowing reverse moves")
 
     # Read arguments from command line
     args = parser.parse_args()
 
     # Run main with provided arguments
-    if not args.user_input and not args.random_solve:
+    if not args.user_input and not args.random_solve and not args.no_reverse_solve:
         print("Usage:'main.py -r' or '-u'")
     else:
-        main(gameboards, args.user_input, args.random_solve)
+        main(gameboards, args.user_input, args.random_solve, args.no_reverse_solve)
