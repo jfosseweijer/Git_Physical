@@ -5,15 +5,20 @@ from tkinter import ttk
 from ttkthemes import ThemedStyle 
 from PIL import Image, ImageTk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from code.classes.board_setup import Board as Board
+from code_files.classes.board_setup import Board as Board
 
 class Interface:
     def __init__(self, master, gameboards):
         self.gameboards = gameboards
         self.master = master
+        self.home()
+        
+
+    def home(self):
+        self.clear_interface()
         self.master.title("RUSH HOUR")
         
-        self.style = ThemedStyle(master)
+        self.style = ThemedStyle(self.master)
         self.style.set_theme("yaru")
 
         # Create dropdown
@@ -27,7 +32,6 @@ class Interface:
         image_menu = ttk.Combobox(master=self.master, textvariable=self.image_var, values=images)
         image_menu.pack(pady=10)
         image_menu.bind("<<ComboboxSelected>>", self.load_image)
-        board_number = int(image_menu.get()[-1])
 
         # Create the label for the image once during initialization
         self.image_label = tk.Label(self.master)
@@ -37,13 +41,13 @@ class Interface:
         self.load_image()  
 
         # Buttons for different functionalities
-        user_button = ttk.Button(master=self.master, text="User", command=lambda: self.create_user(board_number))
+        user_button = ttk.Button(master=self.master, text="User", command=lambda: self.create_user(int(image_menu.get()[-1])-1))
         user_button.pack(side=tk.BOTTOM, fill=tk.X)
 
-        random_button = ttk.Button(master=self.master, text="Random", command=lambda: self.create_random(board_number))
+        random_button = ttk.Button(master=self.master, text="Random", command=lambda: self.create_random(int(image_menu.get()[-1])-1))
         random_button.pack(side=tk.BOTTOM, fill=tk.X)
 
-        algorithm_button = ttk.Button(master=self.master, text="Algorithm", command=lambda: self.create_Algorithm(board_number))
+        algorithm_button = ttk.Button(master=self.master, text="Algorithm", command=lambda: self.create_Algorithm(int(image_menu.get()[-1])-1))
         algorithm_button.pack(side=tk.BOTTOM, fill=tk.X)
 
     def create_user(self, board_number):
@@ -53,61 +57,67 @@ class Interface:
         self.fig, (self.ax1, self.ax2) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [10, 1]}, figsize=(10, 5))
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.master)
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        
+
         self.input_var = tk.StringVar()
-        
-        move_button = ttk.Button(master=self.master, text="Move", command=self.move_car)
+        input_entry = ttk.Entry(self.master, textvariable=self.input_var)
+        input_entry.pack(pady=10)
+
+        move_button = ttk.Button(master=self.master, text="Move", command=lambda: self.move_car())
         move_button.pack()
 
         # Create an instance of the Board class
-        board = Board(self.gameboards[board_number][1])
-        board.setup_board(self.gameboards[board_number][0])
-        
+        self.board = Board(self.gameboards[board_number][1])
+        self.board.setup_board(self.gameboards[board_number][0])
+
         # Call the plot_information method on the board instance
-        vehicles, size, exit = board.plot_information()
+        vehicles, size, exit = self.board.plot_information()
         self.plot(vehicles, size, exit)
 
-    def move_car(self, move):
-        print(move)
-            # car = None
-            # valid_move = False
-            # while valid_move == False:
-            #     board.print_board()
-            #     player_move = input("Enter the car and it's movement: ")
-            #     try:
-            #         player_move = player_move.split(',')
-            #         valid_move = True
-            #     except ValueError:
-            #         valid_move = False
-                    
-            #     if len(player_move) == 2 and valid_move and len(player_move[1]) != 0 :
-            #         car_name = player_move[0].upper()
-            #         try:
-            #             movement = int(player_move[1])
-            #             valid_move = True
-            #         except ValueError:
-            #             valid_move = False
+    def move_car(self):
+        # Clear previous error labels
+        self.clear_error_labels()
 
-            #     if not valid_move:
-            #         player_move = print("Please use this format (A,1): ")
+        move = self.input_var.get()
 
-            #     if valid_move:
-            #         # Find the car and print its current position
-            #         car = board.find_vehicle(car_name)
+        # Split the move input and handle invalid syntax
+        try:
+            car_name, movement = map(str.strip, move.split(','))
+            movement = int(movement)
+        except ValueError:
+            self.display_error("Please use this format 'A,1'")
+            return
 
-            #         if car is None:
-            #             print(f"No car named {car_name} found on the board")
-            #             valid_move = False
+        # Find the car and handle invalid car name
+        car = self.board.find_vehicle(car_name.upper())
+        if car is None:
+            self.display_error(f"No car named {car_name} found on the board")
+            return
 
-            #     # Check if input syntax is correct
-            #     if valid_move:
-            #         try:
-            #             board.move_piece(car_name, movement, user_input)
-            #         except ValueError as e:
-            #             print(e)
-            #             valid_move = False
-            #             print(f"You can't move {car_name} by {movement}")
+        # Try to move the piece and handle invalid moves
+        try:
+            self.board.move_piece(car_name.upper(), movement, move)
+            vehicles, size, exit = self.board.plot_information()
+            self.plot(vehicles, size, exit)
+        except ValueError as e:
+            self.display_error(str(e))
 
+        self.check_winner(car_name)
+        
+    def display_error(self, error_message):
+        # Clear previous error labels, if any
+        for widget in self.master.winfo_children():
+            if isinstance(widget, tk.Label) and widget.cget("fg") == "red":
+                widget.destroy()
+
+        # Display the error message in the Tkinter interface using Label
+        error_label = tk.Label(self.master, text=f"Error: {error_message}", fg="red")
+        error_label.pack()
+
+    def clear_error_labels(self):
+        # Clear all existing error labels
+        for widget in self.master.winfo_children():
+            if isinstance(widget, tk.Label) and widget.cget("fg") == "red":
+                widget.destroy()
 
     def create_random(self):
         self.clear_interface()
@@ -149,7 +159,7 @@ class Interface:
                 grid[row][col] = vehicle.colour
 
         # Create a rectangle for the exit with a black border
-        rect = plt.Rectangle((exit[0] + 0.5, exit[1] - 0.5), 1, 1, linewidth=5, edgecolor='black', facecolor='none', zorder=2)
+        rect = plt.Rectangle((exit[1] + 0.5, exit[0] - 0.5), 1, 1, linewidth=5, edgecolor='black', facecolor='none', zorder=2)
 
         # Clear the previous plots
         self.ax1.clear()
@@ -177,6 +187,23 @@ class Interface:
 
         # Show the figure
         self.canvas.draw()
+        self.master.update_idletasks()
+
+
+    def check_winner(self, car_name):
+        print(car_name)
+
+        if car_name == 'X' or car_name == 'x':
+            if self.board.is_won():
+                self.clear_interface()
+                
+                # Display a message and a button to proceed
+                win_label = tk.Label(self.master, text="Congratulations! You have won!", font=("Helvetica", 16), pady=20)
+                win_label.pack()
+
+                proceed_button = ttk.Button(self.master, text="Proceed", command=self.home())
+                proceed_button.pack()
+
 
     def clear_interface(self):
         # Destroy all widgets in the master window

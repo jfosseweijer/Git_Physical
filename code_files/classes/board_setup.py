@@ -199,49 +199,35 @@ class Board:
             vehicle.change_position(new_positions)
         self.vehicle_position_set = set(itertools.chain(*self.nested_vehicle_positions))
 
-    def print_board(self):
+    def print_board(self, canvas):
         """Prints the board in a neat format."""
+        visualize(self.vehicles_list, self.size, self.exit, canvas)
+        canvas.draw()
 
-        visualize(self.vehicles_list, self.size, self.exit)
-    
     def plot_information(self):
         return self.vehicles_list, self.size, self.exit
-
+    
     def random_solve(self):
         iterations = 0
-        states = [frozenset(sorted(self.vehicle_position_set))]
-        while iterations < 1000:
-            # self.print_board()
+        history = Queue()
+        while not self.is_won() and iterations < 1:
+            if history.size() > 5:
+                history.dequeue()
+            self.print_board()
             iterations += 1
             name, movement, position = random_step(self)
-            vehicle = self.find_vehicle(name)
-            self.update_positions_set(vehicle, position)
-            states.append(frozenset(sorted(self.vehicle_position_set)))
-            # time.sleep(0.2)
-
-        return set(states)
-    
-    # def random_solve(self):
-    #     iterations = 0
-    #     history = Queue()
-    #     while not self.is_won() and iterations < 1:
-    #         if history.size() > 5:
-    #             history.dequeue()
-    #         self.print_board()
-    #         iterations += 1
-    #         name, movement, position = random_step(self)
-    #         try:
-    #             last_move = history.peek_back()
-    #         except AssertionError:
-    #             last_move = (None, 0, None)
-    #         if movement == -abs(last_move[1]) and name == last_move[0]:
-    #             print(f"Reverse movement {name} by {movement}")
-    #         else:
-    #             vehicle = self.find_vehicle(name)
-    #             self.update_positions_set(vehicle, position)
-    #             history.enqueue((name, movement, position))
-    #             time.sleep(0.2)
-    #             print(name, movement)
+            try:
+                last_move = history.peek_back()
+            except AssertionError:
+                last_move = (None, 0, None)
+            if movement == -abs(last_move[1]) and name == last_move[0]:
+                print(f"Reverse movement {name} by {movement}")
+            else:
+                vehicle = self.find_vehicle(name)
+                self.update_positions_set(vehicle, position)
+                history.enqueue((name, movement, position))
+                time.sleep(0.2)
+                print(name, movement)
                 
         
         if self.is_won():

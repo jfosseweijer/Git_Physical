@@ -1,4 +1,4 @@
-from code.visualisation.interface import Interface as Interface
+from code_files.visualisation.interface import Interface as Interface
 import os
 import pandas as pd
 import tkinter as tk
