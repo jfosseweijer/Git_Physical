@@ -9,6 +9,17 @@ import random
 import pandas as pd
 import string
 
+def main():
+    """
+    Main function for testing.
+    """
+    n = 6
+    num_cars = 13
+    for i in range(10):
+        #print(f"Board {i}")
+        position_array = generate_random_board(n, num_cars)
+        print(position_array, end='\n\n')
+
 def generate_car_names(num_cars):
     letters = list(string.ascii_uppercase)
     car_list = []
@@ -21,48 +32,116 @@ def generate_car_names(num_cars):
             car_list.append(letters[i%alphabet_num])
         else:
             car_list.append(letters[i%alphabet_num]+letters[i%alphabet_num])
+
     return car_list
+
+def place_car(car, col, row, orientation, length, direction, position_array):
+    """
+    Places a car on the board.
+    Will only place a car if it fits on the board.
+
+    Parameters
+    ----------
+        car str : Name of the car.
+        col int : Column number.
+        row int : Row number.
+        orientation str : Orientation of the car, either 'H' or 'V'.
+        length int : Length of the car.
+        direction int : Direction of the car, either -1 or 1.
+        position_array np.array : Array representing the board.
+
+    Returns
+    -------
+        position_array np.array : Array representing the board. With new car placed.
+
+    """
+    size = position_array.shape[0]
+    if orientation == 'H' and row == (size - 1) // 2:
+        raise ValueError("Would block X from exiting")
+
+    path = length * direction
+    if orientation == 'H':
+        start, stop = (col+path+1, col+1) if direction == -1 else (col, col+path)
+        in_bounds = start >= 0 if direction == -1 else stop <= size
+        new_positions = position_array[row, start:stop]
+    elif orientation == 'V':
+        start, stop = (row+path+1, row+1) if direction == -1 else (row, row+path)
+        in_bounds = start >= 0 if direction == -1 else stop <= size
+        new_positions = position_array[start:stop, col]
+
+    if np.core.defchararray.equal(new_positions, ' ').all() and in_bounds:
+        new_positions[:] = car
+        return position_array
+    else:
+        raise ValueError("Car does not fit on the board")
 
 def generate_random_board(size, num_cars):
     """
     Generates a random board. Fingers crossed it's solvable.
     """
 
-    position_array = np.zeros((size, size), dtype = str)
-    index = np.arange(size)
-
-    # Define the possible values for each column
+    # Create a list of car names
     car_names = generate_car_names(num_cars)
     if 'X' in car_names:
         car_names.remove('X')
     
-    # Place the red car
-    position_array[(size - 1) // 2, 0:2] = 'X'
-    
+    # Create an empty board and place the red car
+    position_array = np.array([[' '] * size] * size, dtype=str)
+    index = np.arange(size)
+    x_position = (size - 1) // 2
+    position_array[x_position, 0:2] = 'X'
+
+    # Arrays that keep track of the cars that are placed
+    # If a row or column is full, and all cars are in-line,
+    # that row or column is locked. And a new board should be generated.
+    row_horizontals = np.zeros(size, dtype=int)
+    col_verticals = np.zeros(size, dtype=int)
+
+    # Car parameters
+    directions = [-1, 1]
     orientations = ['H', 'V']
     lengths = [2, 2, 2, 3]
-    directions = [-1, 1]
 
-    car_list = []
+    placed = 0
+    errors = 0
 
-    # Generate the rest of the car_list
-    for i in range(num_cars - 1):
-        car = car_names[i]
-        orientation = random.choice(orientations)
-        col = random.choice(index)
+    while placed < num_cars and errors < 100000:
+        name = car_names[placed]
+        column = random.choice(index)
         row = random.choice(index)
+        orientation = random.choice(orientations)
         length = random.choice(lengths)
         direction = random.choice(directions)
-
-        # Check if the car fits on the board
-        if orientation == 'H':
-            if col + length * direction > size - 1:
-                direction *= -1
-        else:
-            if row + length > size - 1:
-                direction *= -1
         
-    return car_list
+        try:
+            position_array = place_car(name, column, row, orientation, length, direction, position_array)
+            placed += 1
+            errors = 0
+            
+            if orientation == 'H':
+                row_horizontals[row] += length
+            elif orientation == 'V':
+                col_verticals[column] += length
+
+            locked_rows = np.any(row_horizontals == size)
+            locked_cols = np.any(col_verticals == size)
+
+            if locked_rows or locked_cols:
+                position_array = np.array([[' '] * size] * size, dtype=str)
+                row_horizontals = np.zeros(size, dtype=int)
+                col_verticals = np.zeros(size, dtype=int)
+                position_array[x_position, 0:2] = 'X'
+                placed = 0
+                continue
+
+        except ValueError:
+            errors += 1
+            continue
+    print(f"Errors: {errors}")
+    if errors == 100000:
+        print("Not all cars could be placed")
+
+    return position_array
 
 def random_step(board):
     """
@@ -97,3 +176,5 @@ def random_step(board):
     movement, position = random.choice(options[vehicle])
 
     return vehicle, movement, position
+
+main()
