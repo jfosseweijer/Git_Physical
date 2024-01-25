@@ -10,20 +10,23 @@ import pandas as pd
 import string
 
 
+
 def generate_car_names(num_cars):
     letters = list(string.ascii_uppercase)
+    letters.remove('X')
     car_list = []
-    alphabet_num = 26
+    alphabet_num = 25
 
     # Makes a list of the alphabet, 
     # if a letter is already in the list, entry will be that letter twice.
-    for i in range(num_cars):
+    for i in range(num_cars - 1):
         if i < alphabet_num:
             car_list.append(letters[i%alphabet_num])
         else:
             car_list.append(letters[i%alphabet_num]+letters[i%alphabet_num])
 
     return car_list
+
 
 def place_car(car, col, row, orientation, length, direction, position_array):
     """
@@ -59,7 +62,7 @@ def place_car(car, col, row, orientation, length, direction, position_array):
         in_bounds = start >= 0 if direction == -1 else stop <= size
         new_positions = position_array[start:stop, col]
 
-    if np.core.defchararray.equal(new_positions, ' ').all() and in_bounds:
+    if np.core.defchararray.equal(new_positions, ' ').all() and not np.core.defchararray.equal(new_positions, 'X').any() and in_bounds:
         new_positions[:] = car
         return position_array
     else:
@@ -80,19 +83,17 @@ def generate_random_board(size, num_cars):
         can be used to fill the board class with .set_board()
     """
 
-    # Create a list of car names
-    car_names = generate_car_names(num_cars)
-    if 'X' not in car_names:
-        car_names.append('X')
-    
-    initial_state = pd.DataFrame(columns=['orientation', 'col', 'row', 'length'], index=pd.Index(car_names, name='car'))
-    
     # Create an empty array to keep track of the board
     position_array = np.array([[' '] * size] * size, dtype=str)
     index = np.arange(size)
     x_row = random.choice(range(1, size - 2))
     x_col = random.choice(range(1, size - 3))
     position_array[x_row, x_col:x_col+2] = 'X'
+
+    # Create a list of car names excluding 'X'
+    car_names = generate_car_names(num_cars)
+
+    initial_state = pd.DataFrame(columns=['orientation', 'col', 'row', 'length'], index=pd.Index(car_names, name='car'))
     initial_state.loc['X'] = ['H', x_col, x_row, 2]
 
     # Arrays that keep track of the cars that are placed
@@ -109,7 +110,7 @@ def generate_random_board(size, num_cars):
     placed = 0
     errors = 0
 
-    while placed < num_cars and errors < 100000:
+    while placed < num_cars - 1 and errors < 100000:
         name = car_names[placed]
         column = random.choice(index)
         row = random.choice(index)
@@ -132,14 +133,14 @@ def generate_random_board(size, num_cars):
             elif orientation == 'V':
                 col_verticals[column] += length
 
-            locked_rows = np.any(row_horizontals == size)
-            locked_cols = np.any(col_verticals == size)
+            locked_rows = np.any(row_horizontals >= size - 1)
+            locked_cols = np.any(col_verticals >= size - 1)
 
             if locked_rows or locked_cols:
                 position_array = np.array([[' '] * size] * size, dtype=str)
                 row_horizontals = np.zeros(size, dtype=int)
                 col_verticals = np.zeros(size, dtype=int)
-                position_array[x_row, x_col:x_col+1] = 'X'
+                position_array[x_row, x_col:x_col+2] = 'X'
                 initial_state.loc['X'] = ['H', x_col, x_row, 2]
                 placed = 0
                 continue
@@ -150,7 +151,6 @@ def generate_random_board(size, num_cars):
 
     if errors == 100000:
         print("Could not place all cars on the board")
-
     return initial_state.dropna()
 
 def random_step(board):
