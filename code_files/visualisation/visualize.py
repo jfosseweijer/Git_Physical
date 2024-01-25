@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot(vehicles, size, exit, canvas):
+def plot(vehicles, size, exit):
     """
     Plot the game board with vehicles and exit.
 
@@ -46,4 +46,4 @@ def plot(vehicles, size, exit, canvas):
     plt.tight_layout()
 
     # Show the figure
-    canvas.draw()
+    plt.savefig("board.png")

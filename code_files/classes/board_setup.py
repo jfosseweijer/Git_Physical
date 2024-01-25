@@ -1,10 +1,12 @@
 import numpy as np
 import itertools
 import time
-from ..classes.history import Queue as Queue
+from ..classes.queue import Queue as Queue
+from ..classes.stack import Stack as Stack
 from ..visualisation.visualize import plot as visualize
 from ..algorithms.randomise import random_step
-from ..algorithms.less_random import random_without_reverse
+from ..algorithms.no_reverse import random_without_reverse
+from ..algorithms.depth_search import depth_search
 
 
 class Vehicle:
@@ -200,41 +202,67 @@ class Board:
             vehicle.change_position(new_positions)
         self.vehicle_position_set = set(itertools.chain(*self.nested_vehicle_positions))
 
-    def print_board(self, canvas):
+    def print_board(self):
         """Prints the board in a neat format."""
-        visualize(self.vehicles_list, self.size, self.exit, canvas)
-        canvas.draw()
+        visualize(self.vehicles_list, self.size, self.exit)
 
     def plot_information(self):
         return self.vehicles_list, self.size, self.exit
     
     def random_solve(self):
         iterations = 0
-        while not self.is_won() and iterations < 1000:
-            self.print_board()
+        self.print_board()
+        while not self.is_won():
+            #self.print_board()
             iterations += 1
             name, movement, position = random_step(self)
             vehicle = self.find_vehicle(name)
             self.update_positions_set(vehicle, position)
-            time.sleep(0.2)
-            print(name, movement)
+            #time.sleep(0.05)
+            #print(name, movement)
+
+        self.is_won()
+        print(f"Solved after {iterations} moves")
 
     def no_reverse_solve(self):
         iterations = 0
         history = Queue()
-        while not self.is_won() and iterations < 1000:
-            self.print_board()
+        self.print_board()
+        while not self.is_won() and iterations < 1000000:
+            #self.print_board()
             iterations += 1
             name, movement, position, history = random_without_reverse(self, history)
             vehicle = self.find_vehicle(name)
             self.update_positions_set(vehicle, position)
-            time.sleep(0.2)
+            #time.sleep(0.05)
             print(name, movement)
             
         if self.is_won():
             print(f"Game is won in {iterations} moves")
         else:
             print(f"Game not solved after {iterations} moves")
+
+    def depth_search(self):
+        iterations = 0
+        bottom = 1000
+        history = Stack()
+        made_moves = {}
+        self.print_board()
+        while not self.is_won():
+            iterations += 1
+            name, movement, position, history, made_moves= depth_search(self, history, made_moves, bottom)
+            vehicle = self.find_vehicle(name)
+            self.update_positions_set(vehicle, position)
+            #time.sleep(0.05)
+            print(name, movement)
+            
+        if self.is_won():
+            print(f"Game is won in {iterations} moves")
+        else:
+            print(f"Game not solved after {iterations} moves")
+
+    def astar_solve(self):
+        pass
         
 
     def is_won(self):
@@ -248,7 +276,7 @@ class Board:
         red_car = self.find_vehicle('X')
 
         if red_car.positions[-1][0] == self.exit[1]:
-            self.print_board()
+            #self.print_board()
             return True
         else:
             return False

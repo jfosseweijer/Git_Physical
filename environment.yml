@@ -1,0 +1,26 @@
+name: progLab
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - numpy
+  - scipy
+  - pandas
+  - scikit-learn
+  - scikit-image
+  - nltk
+  - matplotlib
+  - seaborn
+  - ipywidgets
+  - beautifulsoup4
+  - requests
+  - opencv
+  - tensorflow
+  - pip
+  - jupyter
+  - nbclassic
+  - sqlite
+  - pip:
+    - checkpy
+    - notebook-checker
+    - nb-output-stripper
