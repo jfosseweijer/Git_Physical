@@ -6,7 +6,7 @@ Author: Nanne Hempel
 """
 import random
 import pandas as pd
-from ..classes.history import Queue
+from ..classes.queue import Queue
 
 def random_without_reverse(board, history: Queue):
     """
@@ -47,7 +47,7 @@ def random_without_reverse(board, history: Queue):
         vehicle = random.choice(list(options.keys()))
         movement, position = random.choice(options[vehicle])
 
-        if movement == -abs(last_move[1]) and vehicle == last_move[0]:
+        if movement == -last_move[1] and vehicle == last_move[0]:
             new_move = False
         else:
             new_move = True
