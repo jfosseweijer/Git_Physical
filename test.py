@@ -1,9 +1,13 @@
 
 import numpy as np
-size = 6
+import code_files.algorithms.randomise as randomise
+import code_files.classes.board_setup as setup
 
-row_horizontals = np.zeros(size, dtype=int)
-col_verticals = np.zeros(size, dtype=int)
 
-print(row_horizontals)
-print(col_verticals)    
+random_board, state = randomise.generate_random_board(6, 14)
+print(random_board)
+
+board = setup.Board(6)
+board.setup_board(random_board)
+board.print_board()
+print(state)

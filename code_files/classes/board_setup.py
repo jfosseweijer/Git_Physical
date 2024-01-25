@@ -36,10 +36,11 @@ class Vehicle:
         - position (tuple): The (col, row) coordinates of the top-left corner.
         """  
 
+        ## Er was een -1 in de tuple waardoor generate_random_board niet werkte
         if self.orientation == 'H':
-            self.positions = [(position[0] + i - 1, position[1] - 1) for i in range(self.length)]
+            self.positions = [(position[0] + i, position[1]) for i in range(self.length)]
         else:
-            self.positions = [(position[0] - 1, position[1] + i - 1) for i in range(self.length)]
+            self.positions = [(position[0], position[1] + i) for i in range(self.length)]
 
     def change_position(self, new_positions):
         """
@@ -72,14 +73,14 @@ class Board:
         - gameboard (DataFrame): DataFrame containing vehicle information.
         """
 
-        # Set the grid of the board
+        # Set the grid of the board exit
         for index, (name, car) in enumerate(gameboard.iterrows()):
             # Set length to be an int instead of string
             length = int(car['length'])
 
             if name == 'X':
                 colour = np.array([1, 0, 0])
-                self.exit = (car['row'] - 1, self.size - 1)
+                self.exit = (car['row'], self.size - 1)
             else:
                 colour = self.create_colours(index)
 

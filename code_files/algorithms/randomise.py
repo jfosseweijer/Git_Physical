@@ -82,16 +82,18 @@ def generate_random_board(size, num_cars):
 
     # Create a list of car names
     car_names = generate_car_names(num_cars)
-    if 'X' in car_names:
-        car_names.remove('X')
+    if 'X' not in car_names:
+        car_names.append('X')
     
     initial_state = pd.DataFrame(columns=['orientation', 'col', 'row', 'length'], index=pd.Index(car_names, name='car'))
     
     # Create an empty array to keep track of the board
     position_array = np.array([[' '] * size] * size, dtype=str)
     index = np.arange(size)
-    x_position = (size - 1) // 2
-    position_array[x_position, 0:random.choice(index) % 3] = 'X'
+    x_row = random.choice(range(1, size - 2))
+    x_col = random.choice(range(1, size - 3))
+    position_array[x_row, x_col:x_col+2] = 'X'
+    initial_state.loc['X'] = ['H', x_col, x_row, 2]
 
     # Arrays that keep track of the cars that are placed
     # If a row or column is full, and all cars are in-line,
@@ -137,7 +139,8 @@ def generate_random_board(size, num_cars):
                 position_array = np.array([[' '] * size] * size, dtype=str)
                 row_horizontals = np.zeros(size, dtype=int)
                 col_verticals = np.zeros(size, dtype=int)
-                position_array[x_position, 0:2] = 'X'
+                position_array[x_row, x_col:x_col+1] = 'X'
+                initial_state.loc['X'] = ['H', x_col, x_row, 2]
                 placed = 0
                 continue
 
@@ -146,9 +149,9 @@ def generate_random_board(size, num_cars):
             continue
 
     if errors == 100000:
-        raise Warning("Could not place all cars on the board")
+        print("Could not place all cars on the board")
 
-    return initial_state
+    return initial_state.dropna(), position_array
 
 def random_step(board):
     """
