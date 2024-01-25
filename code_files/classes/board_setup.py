@@ -219,7 +219,7 @@ class Board:
             vehicle = self.find_vehicle(name)
             self.update_positions_set(vehicle, position)
             #time.sleep(0.05)
-            #print(name, movement)
+            print(name, movement)
 
         self.is_won()
         print(f"Solved after {iterations} moves")
@@ -244,11 +244,11 @@ class Board:
 
     def depth_search(self):
         iterations = 0
-        bottom = 1000
+        bottom = 100
         history = Stack()
         made_moves = {}
         self.print_board()
-        while not self.is_won():
+        while not self.is_won() and iterations < 100000:
             iterations += 1
             name, movement, position, history, made_moves= depth_search(self, history, made_moves, bottom)
             vehicle = self.find_vehicle(name)
