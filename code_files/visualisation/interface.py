@@ -5,6 +5,8 @@ from tkinter import ttk
 from ttkthemes import ThemedStyle 
 from PIL import Image, ImageTk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+from code_files.visualisation.int_vis import plot as visualize
 from code_files.classes.board_setup import Board as Board
 from ..algorithms.randomise import random_step
 import time
@@ -73,8 +75,11 @@ class Interface:
         self.board.setup_board(self.gameboards[board_number][0])
 
         # Call the plot_information method on the board instance
-        vehicles, size, exit = self.board.plot_information()
-        self.plot(vehicles, size, exit)
+        visualize(self.board, self.ax1, self.ax2)
+        self.canvas.draw()
+        self.master.update_idletasks()
+
+
 
     def move_car(self):
         # Clear previous error labels
@@ -99,8 +104,10 @@ class Interface:
         # Try to move the piece and handle invalid moves
         try:
             self.board.move_piece(car_name.upper(), movement, move)
-            vehicles, size, exit = self.board.plot_information()
-            self.plot(vehicles, size, exit)
+            visualize(self.board, self.ax1, self.ax2)
+            self.canvas.draw()
+            self.master.update_idletasks()
+
         except ValueError as e:
             self.display_text(str(e), error=True)
 
@@ -141,8 +148,10 @@ class Interface:
         while not is_won and iterations < 100:
             if iterations > 10:
                 self.clear_labels()
-            vehicles_list, size, exit = self.board.plot_information()
-            self.plot(vehicles_list, size, exit)
+            visualize(self.board, self.ax1, self.ax2)
+            self.canvas.draw()
+            self.master.update_idletasks()
+
             iterations += 1
             name, movement, position = random_step(self.board)
             vehicle = self.board.find_vehicle(name)
@@ -150,7 +159,6 @@ class Interface:
             time.sleep(0.2)
             self.display_text((name, movement), move=True)
             self.check_winner(name)
-            
             
     def create_Algorithm(self):
         self.clear_interface()
