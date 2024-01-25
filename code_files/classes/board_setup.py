@@ -1,12 +1,13 @@
 import numpy as np
 import itertools
 import time
-from ..algorithms import randomise
+from ..algorithms import generator as generator
 from ..classes.queue import Queue as Queue
 from ..classes.stack import Stack as Stack
 from ..visualisation.visualize import plot as visualize
 from ..algorithms.no_reverse import random_without_reverse
 from ..algorithms.depth_search import depth_search
+from ..algorithms.randomise import random_step
 
 
 class Vehicle:
@@ -53,17 +54,19 @@ class Vehicle:
         self.positions = new_positions
             
 class Board:
-    def __init__(self, size):
+    def __init__(self, size, show_board=False):
         """
         Initializes the Board class with the specified size.
 
         Parameters:
         - size (int): The size of the board.
+        - show_board (bool): Whether or not to update board.png every step.
         """
 
         self.vehicles_list = []
         self.nested_vehicle_positions = []
         self.size = size
+        self.show_board = show_board
 
     def setup_board(self, gameboard):
         """
@@ -214,12 +217,13 @@ class Board:
         iterations = 0
         self.print_board()
         while not self.is_won():
-            #self.print_board()
             iterations += 1
-            name, movement, position = randomise.random_step(self)
+            name, movement, position = random_step(self)
             vehicle = self.find_vehicle(name)
             self.update_positions_set(vehicle, position)
-            #time.sleep(0.05)
+            if self.show_board:
+                time.sleep(0.05)
+                self.print_board()
             print(name, movement)
 
         self.is_won()
@@ -230,12 +234,13 @@ class Board:
         history = Queue()
         self.print_board()
         while not self.is_won() and iterations < 1000000:
-            #self.print_board()
             iterations += 1
             name, movement, position, history = random_without_reverse(self, history)
             vehicle = self.find_vehicle(name)
             self.update_positions_set(vehicle, position)
-            #time.sleep(0.05)
+            if self.show_board:
+                time.sleep(0.05)
+                self.print_board()
             print(name, movement)
             
         if self.is_won():
@@ -254,7 +259,9 @@ class Board:
             name, movement, position, history, made_moves= depth_search(self, history, made_moves, bottom)
             vehicle = self.find_vehicle(name)
             self.update_positions_set(vehicle, position)
-            #time.sleep(0.05)
+            if self.show_board:
+                time.sleep(0.05)
+                self.print_board()
             print(name, movement)
             
         if self.is_won():
@@ -266,7 +273,7 @@ class Board:
         pass
     
     def generate_random_board(self, num_cars):
-        df_board_start = randomise.generate_random_board(self.size, num_cars)
+        df_board_start = generator.random_board(self.size, num_cars)
         self.setup_board(df_board_start)
 
     def is_won(self):
