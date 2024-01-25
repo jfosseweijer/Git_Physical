@@ -151,7 +151,7 @@ def generate_random_board(size, num_cars):
     if errors == 100000:
         print("Could not place all cars on the board")
 
-    return initial_state.dropna(), position_array
+    return initial_state.dropna()
 
 def random_step(board):
     """
