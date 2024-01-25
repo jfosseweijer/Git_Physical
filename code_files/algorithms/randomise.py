@@ -91,7 +91,7 @@ def generate_random_board(size, num_cars):
     position_array = np.array([[' '] * size] * size, dtype=str)
     index = np.arange(size)
     x_position = (size - 1) // 2
-    position_array[x_position, 0:2] = 'X'
+    position_array[x_position, 0:random.choice(index) % 3] = 'X'
 
     # Arrays that keep track of the cars that are placed
     # If a row or column is full, and all cars are in-line,
@@ -146,7 +146,7 @@ def generate_random_board(size, num_cars):
             continue
 
     if errors == 100000:
-        print("Not all cars could be placed")
+        raise Warning("Could not place all cars on the board")
 
     return initial_state
 
