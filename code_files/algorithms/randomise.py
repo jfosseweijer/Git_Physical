@@ -9,16 +9,6 @@ import random
 import pandas as pd
 import string
 
-def main():
-    """
-    Main function for testing.
-    """
-    n = 6
-    num_cars = 13
-    for i in range(10):
-        #print(f"Board {i}")
-        position_array = generate_random_board(n, num_cars)
-        print(position_array, end='\n\n')
 
 def generate_car_names(num_cars):
     letters = list(string.ascii_uppercase)
@@ -78,6 +68,16 @@ def place_car(car, col, row, orientation, length, direction, position_array):
 def generate_random_board(size, num_cars):
     """
     Generates a random board. Fingers crossed it's solvable.
+
+    Parameters
+    ----------
+        size int : Size of the board.
+        num_cars int : Number of cars on the board.
+
+    Returns
+    -------
+        initial_state pd.DataFrame : Initial state of the board.
+        can be used to fill the board class with .set_board()
     """
 
     # Create a list of car names
@@ -85,7 +85,9 @@ def generate_random_board(size, num_cars):
     if 'X' in car_names:
         car_names.remove('X')
     
-    # Create an empty board and place the red car
+    initial_state = pd.DataFrame(columns=['orientation', 'col', 'row', 'length'], index=pd.Index(car_names, name='car'))
+    
+    # Create an empty array to keep track of the board
     position_array = np.array([[' '] * size] * size, dtype=str)
     index = np.arange(size)
     x_position = (size - 1) // 2
@@ -115,6 +117,11 @@ def generate_random_board(size, num_cars):
         
         try:
             position_array = place_car(name, column, row, orientation, length, direction, position_array)
+            if direction == 1:
+                initial_state.loc[name] = [orientation, column, row, length]
+            elif direction == -1:
+                initial_state.loc[name] = [orientation, column - length + 1, row, length] if orientation == 'H' \
+                                     else [orientation, column, row - length + 1, length]
             placed += 1
             errors = 0
             
@@ -137,11 +144,11 @@ def generate_random_board(size, num_cars):
         except ValueError:
             errors += 1
             continue
-    print(f"Errors: {errors}")
+
     if errors == 100000:
         print("Not all cars could be placed")
 
-    return position_array
+    return initial_state
 
 def random_step(board):
     """
@@ -177,4 +184,3 @@ def random_step(board):
 
     return vehicle, movement, position
 
-main()
