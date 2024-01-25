@@ -28,7 +28,7 @@ def generate_car_names(num_cars):
     return car_list
 
 
-def place_car(car, col, row, orientation, length, direction, position_array):
+def place_car(car, col, row, orientation, length, direction, position_array, x_col, x_row):
     """
     Places a car on the board.
     Will only place a car if it fits on the board.
@@ -49,10 +49,14 @@ def place_car(car, col, row, orientation, length, direction, position_array):
 
     """
     size = position_array.shape[0]
-    if orientation == 'H' and row == (size - 1) // 2:
-        raise ValueError("Would block X from exiting")
-
     path = length * direction
+    # Horizontal cars can only be placed left of the red car
+    if orientation == 'H' and row == x_row:
+        between_x_and_exit = (col + path + 1) >= x_col + 2 if direction == -1 else (col) >= x_col + 2
+        if between_x_and_exit:
+            raise ValueError("Car cannot be placed between X and exit")
+        
+
     if orientation == 'H':
         start, stop = (col+path+1, col+1) if direction == -1 else (col, col+path)
         in_bounds = start >= 0 if direction == -1 else stop <= size
@@ -119,7 +123,7 @@ def generate_random_board(size, num_cars):
         direction = random.choice(directions)
         
         try:
-            position_array = place_car(name, column, row, orientation, length, direction, position_array)
+            position_array = place_car(name, column, row, orientation, length, direction, position_array, x_col, x_row)
             if direction == 1:
                 initial_state.loc[name] = [orientation, column, row, length]
             elif direction == -1:
@@ -151,6 +155,7 @@ def generate_random_board(size, num_cars):
 
     if errors == 100000:
         print("Could not place all cars on the board")
+    print(position_array)
     return initial_state.dropna()
 
 def random_step(board):
