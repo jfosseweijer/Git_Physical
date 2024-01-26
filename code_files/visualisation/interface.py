@@ -113,24 +113,6 @@ class Interface:
 
         self.check_winner(car_name)
         
-    def display_text(self, text_message, error=False, move=False):
-        # Display the error message in the Tkinter interface using Label
-        if error:
-            error_label = tk.Label(self.master, text=f"Error: {text_message}", fg="red")
-            error_label.pack()
-        elif move:
-            move_label = tk.Label(self.master, text=f"Moved: {text_message}", fg="blue")
-            move_label.pack()
-
-    def clear_labels(self):
-        # Clear all existing error labels
-        for widget in self.master.winfo_children():
-            if isinstance(widget, tk.Label) and widget.cget("fg") == "red":
-                widget.destroy()
-            if isinstance(widget, tk.Label) and widget.cget("fg") == "blue":
-                widget.destroy()
-                break
-
     def create_random(self, board_number):
         self.clear_interface()
         self.master.title("random")
@@ -159,6 +141,15 @@ class Interface:
             time.sleep(0.2)
             self.display_text((name, movement), move=True)
             self.check_winner(name)
+
+    def display_text(self, text_message, error=False, move=False):
+        # Display the error message in the Tkinter interface using Label
+        if error:
+            error_label = tk.Label(self.master, text=f"Error: {text_message}", fg="red")
+            error_label.pack()
+        elif move:
+            move_label = tk.Label(self.master, text=f"Moved: {text_message}", fg="blue")
+            move_label.pack()
             
     def create_Algorithm(self):
         self.clear_interface()
@@ -176,57 +167,6 @@ class Interface:
         # Update the image of the existing label
         self.image_label.config(image=self.photo)
 
-    
-    def plot(self, vehicles, size, exit):
-        """
-        Plot the game board with vehicles and exit.
-
-        Parameters:
-        - vehicles: List of Vehicle objects representing the vehicles on the board.
-        - size: Size of the game board.
-        - exit: Tuple representing the position of the exit (row, column).
-        """
-        # Create a grid for the game board
-        grid = np.ones((size, size, 3))
-
-        # Mark positions of vehicles on the grid
-        for vehicle in vehicles:
-            for position in vehicle.positions:
-                col, row = position
-                grid[row][col] = vehicle.colour
-
-        # Create a rectangle for the exit with a black border
-        rect = plt.Rectangle((exit[1] + 0.5, exit[0] - 0.5), 1, 1, linewidth=5, edgecolor='black', facecolor='none', zorder=2)
-
-        # Clear the previous plots
-        self.ax1.clear()
-        self.ax2.clear()
-
-        # Plot the image with the grid on the first subplot
-        self.ax1.imshow(grid, interpolation='nearest')
-
-        self.ax1.set_xticks(np.arange(0.5, size + 0.5, 1))
-        self.ax1.set_yticks(np.arange(0.5, size + 0.5, 1))
-        self.ax1.grid(axis='both', color='white', linewidth=2)
-        self.ax1.tick_params(bottom=False, top=False, left=False, right=False, labelbottom=False, labelleft=False)
-
-        # Add the rectangle to the plot
-        self.ax1.add_patch(rect)
-
-        # Create legend with explicit labels on the second subplot
-        for vehicle in vehicles:
-            self.ax2.plot([], [], color=np.array(vehicle.colour), label=vehicle.name)
-        self.ax2.legend()
-        self.ax2.axis('off')
-
-        # Adjust layout to prevent clipping of legend
-        plt.tight_layout()
-
-        # Show the figure
-        self.canvas.draw()
-        self.master.update_idletasks()
-
-
     def check_winner(self, car_name):
         if car_name == 'X' or car_name == 'x':
             if self.board.is_won():
@@ -238,7 +178,15 @@ class Interface:
 
                 proceed_button = ttk.Button(self.master, text="Proceed", command=self.home())
                 proceed_button.pack()
-
+    
+    def clear_labels(self):
+        # Clear all existing error labels
+        for widget in self.master.winfo_children():
+            if isinstance(widget, tk.Label) and widget.cget("fg") == "red":
+                widget.destroy()
+            if isinstance(widget, tk.Label) and widget.cget("fg") == "blue":
+                widget.destroy()
+                break
 
     def clear_interface(self):
         # Destroy all widgets in the master window
