@@ -218,13 +218,13 @@ class Board:
     def random_solve(self):
         iterations = 0
         while not self.is_won() and iterations < 1000000:
-            self.print_board()
+            #self.print_board()
             iterations += 1
             name, movement, position = random_step(self)
             vehicle = self.find_vehicle(name)
             self.update_positions_set(vehicle, position)
-            time.sleep(0.05)
-            print(name, movement)
+            #time.sleep(0.05)
+            #print(name, movement)
 
         if self.is_won():
             print(f"Game is won in {iterations} moves")
@@ -250,7 +250,7 @@ class Board:
 
     def depth_search(self):
         iterations = 0
-        bottom = 100
+        bottom = 50
         history = Stack()
         made_moves = {}
         while not self.is_won() and iterations < 100000:
@@ -260,7 +260,7 @@ class Board:
             vehicle = self.find_vehicle(name)
             self.update_positions_set(vehicle, position)
             #time.sleep(0.05)
-            print(name, movement)
+            #print(name, movement)
             
         if self.is_won():
             print(f"Game is won in {iterations} moves")
@@ -282,9 +282,9 @@ class Board:
             vehicle = board.find_vehicle(name)
             board.update_positions_set(vehicle, position)
             current_layer_boards.append((board, (name, movement, position)))
-            #board.print_board()
-            #time.sleep(0.05)
-            #print(name, movement)
+            board.print_board()
+            time.sleep(0.05)
+            print(name, movement)
             if iterations % 1000 == 0:
                 print(iterations)
 
