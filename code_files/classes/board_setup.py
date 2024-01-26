@@ -41,9 +41,15 @@ class Vehicle:
 
         ## Er was een -1 in de tuple waardoor generate_random_board niet werkte
         if self.orientation == 'H':
+<<<<<<< HEAD
+            self.positions = [(position[0] + i -1, position[1] -1) for i in range(self.length)]
+        else:
+            self.positions = [(position[0] -1, position[1] + i -1) for i in range(self.length)]
+=======
             self.positions = [(position[0] + i - 1, position[1] - 1) for i in range(self.length)]
         else:
             self.positions = [(position[0] - 1, position[1] + i - 1) for i in range(self.length)]
+>>>>>>> a28fddbadc46a82be6cf081c24a84bce5d14e635
 
     def change_position(self, new_positions):
         """
@@ -233,15 +239,15 @@ class Board:
 
     def no_reverse_solve(self):
         iterations = 0
-        history = Queue()
+        move = (None, 0, None)
         while not self.is_won() and iterations < 1000000:
-            #self.print_board()
+            self.print_board()
             iterations += 1
-            name, movement, position, history = random_without_reverse(self, history)
-            vehicle = self.find_vehicle(name)
-            self.update_positions_set(vehicle, position)
-            #time.sleep(0.05)
-            print(name, movement)
+            move = random_without_reverse(self, move)
+            vehicle = self.find_vehicle(move[0])
+            self.update_positions_set(vehicle, move[2])
+            time.sleep(0.05)
+            print(move[0], move[1])
             
         if self.is_won():
             print(f"Game is won in {iterations} moves")
