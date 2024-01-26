@@ -41,15 +41,9 @@ class Vehicle:
 
         ## Er was een -1 in de tuple waardoor generate_random_board niet werkte
         if self.orientation == 'H':
-<<<<<<< HEAD
-            self.positions = [(position[0] + i -1, position[1] -1) for i in range(self.length)]
-        else:
-            self.positions = [(position[0] -1, position[1] + i -1) for i in range(self.length)]
-=======
             self.positions = [(position[0] + i - 1, position[1] - 1) for i in range(self.length)]
         else:
             self.positions = [(position[0] - 1, position[1] + i - 1) for i in range(self.length)]
->>>>>>> a28fddbadc46a82be6cf081c24a84bce5d14e635
 
     def change_position(self, new_positions):
         """
@@ -276,7 +270,7 @@ class Board:
     def breadth_search(self):
         iterations = 0
         current_layer_boards = []
-        current_layer_index = 0
+        current_layer_index = None
         former_layer_boards = [(self, (None, None, None))]
         former_layer_index = 0
         board: Board = copy.deepcopy(former_layer_boards[former_layer_index][0])
@@ -284,14 +278,13 @@ class Board:
         while not board.is_won() and iterations < 1000000:
             iterations += 1
             name, movement, position, current_layer_boards, current_layer_index, former_layer_boards, former_layer_index = breadth_search(current_layer_boards, current_layer_index, former_layer_boards, former_layer_index)
-            if name != None:
-                board: Board = copy.deepcopy(former_layer_boards[former_layer_index][0])
-                vehicle = board.find_vehicle(name)
-                board.update_positions_set(vehicle, position)
-                current_layer_boards.append((board, (name, movement, position)))
-                board.print_board()
-                time.sleep(0.05)
-                print(name, movement)
+            board: Board = copy.deepcopy(former_layer_boards[former_layer_index][0])
+            vehicle = board.find_vehicle(name)
+            board.update_positions_set(vehicle, position)
+            current_layer_boards.append((board, (name, movement, position)))
+            #board.print_board()
+            #time.sleep(0.05)
+            #print(name, movement)
             if iterations % 1000 == 0:
                 print(iterations)
 

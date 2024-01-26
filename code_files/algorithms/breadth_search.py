@@ -13,11 +13,15 @@ def breadth_search(current_layer_boards: list, current_layer_index, former_layer
     Randomly select a step that is valid. Steps that undo the last move are invalid
     """
 
+    if current_layer_index != None and current_layer_index < 0:
+        current_layer_index = None
+        former_layer_index += 1
+
     if former_layer_index == len(former_layer_boards):
         former_layer_boards.clear()
         former_layer_boards = current_layer_boards[:]
         former_layer_index = 0
-        current_layer_index = 0
+        current_layer_index = None
         current_layer_boards.clear()
 
     board = former_layer_boards[former_layer_index][0]
@@ -44,14 +48,12 @@ def breadth_search(current_layer_boards: list, current_layer_index, former_layer
         raise ValueError("No possible moves found")
     
     # Select a random vehicle and a random move
-    if current_layer_index < len(options):
+    if current_layer_index == None:
+        current_layer_index = len(options)
+
+    if current_layer_index >= 0:
+        current_layer_index -= 1
         vehicle = options[current_layer_index][0]
         movement, position = options[current_layer_index][1] 
-        current_layer_index += 1
-
-    else:
-        current_layer_index = 0
-        former_layer_index += 1
-        vehicle, movement, position = None, None, None
 
     return vehicle, movement, position, current_layer_boards, current_layer_index, former_layer_boards, former_layer_index
