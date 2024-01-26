@@ -17,7 +17,7 @@ def plot(self, ax1, ax2):
     for vehicle in self.vehicles_list:
         for position in vehicle.positions:
             col, row = position
-            grid[row - 1][col - 1] = vehicle.colour
+            grid[row][col] = vehicle.colour
 
     # Create a rectangle for the exit with a black border
     rect = plt.Rectangle((self.exit[1] + 0.5, self.exit[0] - 0.5), 1, 1, linewidth=5, edgecolor='black', facecolor='none', zorder=2)

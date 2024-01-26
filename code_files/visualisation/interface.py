@@ -10,8 +10,11 @@ from ..classes.queue import Queue
 from code_files.visualisation.int_vis import plot as visualize
 from code_files.classes.board_setup import Board as Board
 from ..algorithms.no_reverse import random_without_reverse
+from ..algorithms.breadth_search import breadth_search
 from ..algorithms.randomise import random_step
+
 import time
+import copy
 
 
 class Interface:
@@ -50,10 +53,13 @@ class Interface:
         user_button = ttk.Button(master=self.master, text="User", command=lambda: self.create_user(int(image_menu.get()[-1])-1))
         user_button.pack(side=tk.BOTTOM, fill=tk.X)
 
-        random_button = ttk.Button(master=self.master, text="Random", command=lambda: self.create_random(int(image_menu.get()[-1])-1))
+        random_button = ttk.Button(master=self.master, text="Random", command=lambda: self.algorithm(int(image_menu.get()[-1])-1, alg_type = 'random'))
         random_button.pack(side=tk.BOTTOM, fill=tk.X)
 
-        algorithm_button = ttk.Button(master=self.master, text="Not reversing random algorithm", command=lambda: self.create_no_reverse(int(image_menu.get()[-1])-1))
+        algorithm_button = ttk.Button(master=self.master, text="Not reversing random algorithm", command=lambda: self.algorithm(int(image_menu.get()[-1])-1, alg_type = 'non-reverse'))
+        algorithm_button.pack(side=tk.BOTTOM, fill=tk.X)
+
+        algorithm_button = ttk.Button(master=self.master, text="breadth_search", command=lambda: self.algorithm(int(image_menu.get()[-1])-1, alg_type = 'breadth'))
         algorithm_button.pack(side=tk.BOTTOM, fill=tk.X)
 
     def create_user(self, board_number):
@@ -112,7 +118,7 @@ class Interface:
 
         self.check_winner(car_name)
         
-    def create_random(self, board_number):
+    def algorithm(self, board_number, alg_type):
         self.clear_interface()
         self.master.title("random")
         
@@ -126,7 +132,17 @@ class Interface:
         
         iterations = 0
         is_won = False
+        if alg_type == 'non-reverse':
+            move = (None, 0, None)
+        elif alg_type == 'breadth':
+            current_layer_boards = []
+            current_layer_index = 0
+            former_layer_boards = [(self.board, (None, 0, None))]
+            former_layer_index = 0
+            move = (None, 0, None, current_layer_boards, current_layer_index, former_layer_boards, former_layer_index)
+            self.board: Board = copy.deepcopy(former_layer_boards[former_layer_index][0])
 
+        start = time.time()
         while not is_won and iterations < 100:
             if iterations > 10:
                 self.clear_labels()
@@ -135,44 +151,25 @@ class Interface:
             self.master.update_idletasks()
 
             iterations += 1
-            name, movement, position = random_step(self.board)
-            vehicle = self.board.find_vehicle(name)
-            self.board.update_positions_set(vehicle, position)
-            time.sleep(0.2)
-            self.display_text((name, movement), move=True)
-            self.check_winner(name)
-    
-    def create_no_reverse(self, board_number):
-        self.clear_interface()
-        self.master.title("random")
-        
-        self.fig, (self.ax1, self.ax2) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [10, 1]}, figsize=(10, 5))
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.master)
-        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        
-        # Create an instance of the Board class
-        self.board = Board(self.gameboards[board_number][1])
-        self.board.setup_board(self.gameboards[board_number][0])
-        
-        iterations = 0
-        is_won = False
-        move = (None, 0, None)
+            
+            if alg_type == 'random':
+                move = random_step(self.board)
+            elif alg_type == 'non-reverse':
+                move = random_without_reverse(self.board, move)
+            elif alg_type == 'breadth':
+                move = breadth_search(move[3], move[4], move[5], move[6])
+                self.board: Board = copy.deepcopy(move[5][move[6]][0])
+                print(move)
+            
+            try:            
+                vehicle = self.board.find_vehicle(move[0])
+            except UnboundLocalError:
+                break
 
-        while not is_won and iterations < 100:
-            if iterations > 10:
-                self.clear_labels()
-            visualize(self.board, self.ax1, self.ax2)
-            self.canvas.draw()
-            self.master.update_idletasks()
-
-            iterations += 1
-            move = random_without_reverse(self.board, move)
-            vehicle = self.board.find_vehicle(move[0])
             self.board.update_positions_set(vehicle, move[2])
             time.sleep(0.2)
             self.display_text((move[0], move[1]), move=True)
-            self.check_winner(move[0])
-
+            self.check_winner(move[0], time.time() - start - iterations * 0.2)
 
     def display_text(self, text_message, error=False, move=False):
         # Display the error message in the Tkinter interface using Label
@@ -199,7 +196,7 @@ class Interface:
         # Update the image of the existing label
         self.image_label.config(image=self.photo)
 
-    def check_winner(self, car_name):
+    def check_winner(self, car_name, time):
         if car_name == 'X' or car_name == 'x':
             if self.board.is_won():
                 self.clear_interface()
@@ -210,6 +207,8 @@ class Interface:
 
                 proceed_button = ttk.Button(self.master, text="Proceed", command=self.home())
                 proceed_button.pack()
+        else:
+            pass
     
     def clear_labels(self):
         # Clear all existing error labels
