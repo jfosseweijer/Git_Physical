@@ -6,8 +6,10 @@ from ttkthemes import ThemedStyle
 from PIL import Image, ImageTk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+from ..classes.queue import Queue
 from code_files.visualisation.int_vis import plot as visualize
 from code_files.classes.board_setup import Board as Board
+from ..algorithms.no_reverse import random_without_reverse
 from ..algorithms.randomise import random_step
 import time
 
@@ -17,7 +19,6 @@ class Interface:
         self.gameboards = gameboards
         self.master = master
         self.home()
-        
 
     def home(self):
         self.clear_interface()
@@ -52,7 +53,7 @@ class Interface:
         random_button = ttk.Button(master=self.master, text="Random", command=lambda: self.create_random(int(image_menu.get()[-1])-1))
         random_button.pack(side=tk.BOTTOM, fill=tk.X)
 
-        algorithm_button = ttk.Button(master=self.master, text="Algorithm", command=lambda: self.create_Algorithm(int(image_menu.get()[-1])-1))
+        algorithm_button = ttk.Button(master=self.master, text="Not reversing random algorithm", command=lambda: self.create_no_reverse(int(image_menu.get()[-1])-1))
         algorithm_button.pack(side=tk.BOTTOM, fill=tk.X)
 
     def create_user(self, board_number):
@@ -78,8 +79,6 @@ class Interface:
         visualize(self.board, self.ax1, self.ax2)
         self.canvas.draw()
         self.master.update_idletasks()
-
-
 
     def move_car(self):
         # Clear previous error labels
@@ -127,6 +126,7 @@ class Interface:
         
         iterations = 0
         is_won = False
+
         while not is_won and iterations < 100:
             if iterations > 10:
                 self.clear_labels()
@@ -141,6 +141,38 @@ class Interface:
             time.sleep(0.2)
             self.display_text((name, movement), move=True)
             self.check_winner(name)
+    
+    def create_no_reverse(self, board_number):
+        self.clear_interface()
+        self.master.title("random")
+        
+        self.fig, (self.ax1, self.ax2) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [10, 1]}, figsize=(10, 5))
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.master)
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        
+        # Create an instance of the Board class
+        self.board = Board(self.gameboards[board_number][1])
+        self.board.setup_board(self.gameboards[board_number][0])
+        
+        iterations = 0
+        is_won = False
+        move = (None, 0, None)
+
+        while not is_won and iterations < 100:
+            if iterations > 10:
+                self.clear_labels()
+            visualize(self.board, self.ax1, self.ax2)
+            self.canvas.draw()
+            self.master.update_idletasks()
+
+            iterations += 1
+            move = random_without_reverse(self.board, move)
+            vehicle = self.board.find_vehicle(move[0])
+            self.board.update_positions_set(vehicle, move[2])
+            time.sleep(0.2)
+            self.display_text((move[0], move[1]), move=True)
+            self.check_winner(move[0])
+
 
     def display_text(self, text_message, error=False, move=False):
         # Display the error message in the Tkinter interface using Label
@@ -158,7 +190,7 @@ class Interface:
     def load_image(self, event=None):
         # Use self.image_var.get() to get the selected value
         board_number = int(self.image_var.get()[-1])
-        path = f"data\\gameboards_start_layout\\game{board_number}.png"
+        path = f"data/gameboards_start_layout/game{board_number}.png"
 
         image = Image.open(path)
         image = image.resize((600, 300))

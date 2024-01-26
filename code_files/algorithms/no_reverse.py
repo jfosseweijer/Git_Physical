@@ -8,15 +8,10 @@ import random
 import pandas as pd
 from ..classes.queue import Queue
 
-def random_without_reverse(board, history: Queue):
+def random_without_reverse(board, last_move):
     """
     Randomly select a step that is valid. Steps that undo the last move are invalid
     """
-    try:
-        last_move = history.peek_back()
-    except AssertionError:
-        last_move = (None, 0, None)
-
     options = {}
     # For each vehicle on the board, check if it can move
     for vehicle in board.vehicles_list:
@@ -46,7 +41,5 @@ def random_without_reverse(board, history: Queue):
     vehicle = random.choice(list(options.keys()))
     movement, position = random.choice(options[vehicle])
 
-    history.enqueue((vehicle, movement, position))
-
-    return vehicle, movement, position, history
+    return vehicle, movement, position
 
