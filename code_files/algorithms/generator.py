@@ -91,7 +91,7 @@ def random_board(size, num_cars, car_truck_ratio, lock_limit, exit_distance):
     position_array = np.array([[' '] * size] * size, dtype=str)
     index = np.arange(size)
     x_row = random.choice(range(1, size - 2))
-    x_col = random.choice(range(1, size - 3))
+    x_col = random.choice(range(1, size - exit_distance - 1))
     position_array[x_row, x_col:x_col+2] = 'X'
 
     # Create a list of car names excluding 'X'
@@ -109,7 +109,7 @@ def random_board(size, num_cars, car_truck_ratio, lock_limit, exit_distance):
     # Car parameters
     directions = [-1, 1]
     orientations = ['H', 'V']
-    lengths = [2, 2, 2, 3]
+    lengths = [2 for _ in range(car_truck_ratio)] + [3]
 
     placed = 0
     errors = 0
@@ -138,8 +138,8 @@ def random_board(size, num_cars, car_truck_ratio, lock_limit, exit_distance):
                 col_verticals[column] += length
 
             ## This can be set as a difficulty parameter
-            locked_rows = np.any(row_horizontals >= size - 1)
-            locked_cols = np.any(col_verticals >= size - 1)
+            locked_rows = np.any(row_horizontals >= size - lock_limit)
+            locked_cols = np.any(col_verticals >= size - lock_limit)
 
             if locked_rows or locked_cols:
                 position_array = np.array([[' '] * size] * size, dtype=str)
