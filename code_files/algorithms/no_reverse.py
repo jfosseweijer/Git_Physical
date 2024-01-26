@@ -2,7 +2,7 @@
 Function(s) for the random solution baseline.
 These are meant to be called by the board class.
 
-Author: Nanne Hempel
+Author: 
 """
 import random
 import pandas as pd

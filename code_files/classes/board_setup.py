@@ -272,8 +272,8 @@ class Board:
     def astar_solve(self):
         pass
     
-    def generate_random_board(self, num_cars):
-        df_board_start = generator.random_board(self.size, num_cars)
+    def generate_random_board(self, num_cars, car_truck_ratio, lock_limit, exit_distance):
+        df_board_start = generator.random_board(self.size, num_cars, car_truck_ratio, lock_limit, exit_distance)
         self.setup_board(df_board_start)
 
     def is_won(self):
