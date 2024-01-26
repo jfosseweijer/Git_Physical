@@ -80,6 +80,9 @@ def random_board(size, num_cars, car_truck_ratio, lock_limit, exit_distance):
     ----------
         size int : Size of the board.
         num_cars int : Number of cars on the board.
+        car_truck_ratio int : Ratio of cars to trucks.
+        lock_limit int : Minimum number of open spaces in column or row
+        before it is considered locked. Higher values result in easier boards.
 
     Returns
     -------
@@ -157,6 +160,9 @@ def random_board(size, num_cars, car_truck_ratio, lock_limit, exit_distance):
     if errors == 100000:
         print("Could not place all cars on the board")
 
+    # Add 1 to the column and row numbers to make it human readable
+    initial_state['col'] += 1
+    initial_state['row'] += 1
     return initial_state.dropna()
 
 def random_step(board):

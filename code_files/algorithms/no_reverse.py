@@ -11,7 +11,10 @@ def random_without_reverse(board, last_move):
     """
     Randomly select a step that is valid. Steps that undo the last move are invalid
     """
+<<<<<<< HEAD
 
+=======
+>>>>>>> a28fddbadc46a82be6cf081c24a84bce5d14e635
     options = {}
     # For each vehicle on the board, check if it can move
     for vehicle in board.vehicles_list:
