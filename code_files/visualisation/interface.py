@@ -158,7 +158,7 @@ class Interface:
     def load_image(self, event=None):
         # Use self.image_var.get() to get the selected value
         board_number = int(self.image_var.get()[-1])
-        path = f"data\\gameboards_start_layout\\game{board_number}.png"
+        path = f"data/gameboards_start_layout/game{board_number}.png"
 
         image = Image.open(path)
         image = image.resize((600, 300))
