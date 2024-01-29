@@ -218,7 +218,7 @@ class Board:
     
     def random_solve(self):
         self.iterations = 0
-        while not self.is_won() and self.iterations < 1000000:
+        while not self.is_won() and self.iterations < 1e6:
             #self.print_board()
             self.iterations += 1
             name, movement, position = random_step(self)
@@ -235,7 +235,7 @@ class Board:
     def no_reverse_solve(self):
         self.iterations = 0
         move = (None, 0, None)
-        while not self.is_won() and self.iterations < 1000000:
+        while not self.is_won() and self.iterations < 1e6:
             #self.print_board()
             self.iterations += 1
             move = random_without_reverse(self, move)
@@ -254,7 +254,7 @@ class Board:
         bottom = 50
         history = Stack()
         made_moves = {}
-        while not self.is_won() and self.iterations < 100000:
+        while not self.is_won() and self.iterations < 1e5:
             #self.print_board()
             self.iterations += 1
             name, movement, position, history, made_moves = depth_search(self, history, made_moves, bottom)
@@ -276,7 +276,7 @@ class Board:
         former_layer_index = 0
         board: Board = copy.deepcopy(former_layer_boards[former_layer_index][0])
         board.print_board()
-        while not board.is_won() and self.iterations < 10000:
+        while not board.is_won() and self.iterations < 1e5:
             self.iterations += 1
             name, movement, position, current_layer_boards, current_layer_index, former_layer_boards, former_layer_index = breadth_search(current_layer_boards, current_layer_index, former_layer_boards, former_layer_index)
             board: Board = copy.deepcopy(former_layer_boards[former_layer_index][0])
@@ -297,12 +297,43 @@ class Board:
     def astar_solve(self):
         pass
 
-    def random_board_df(size, num_cars, car_truck_ratio, lock_limit, exit_distance):
-        df_board_start = generator.random_board(size, num_cars, car_truck_ratio, lock_limit, exit_distance)
+    def random_board_df(size, num_cars, car_truck_ratio, lock_limit, exit_distance, HV_ratio):
+        """
+        Returns a random board as a DataFrame.
+        Sometimes we want just the dataframe, so we can set up
+        multiple boards at with the same initial state.
+
+        Parameters
+        ----------
+            size int : Size of the board.
+            num_cars int : Number of cars on the board.
+            car_truck_ratio tuple : Ratio of cars to trucks.
+            lock_limit int : Minimum number of open spaces in column or row
+            before it is considered locked. Higher values result in easier boards.
+            HV_ratio tuple : Ratio of horizontal to vertical cars.
+        
+        Returns
+        -------
+            initial_state pd.DataFrame : Initial state of the board.
+            can be used to fill the board class with .set_board()
+        """
+        df_board_start = generator.random_board(size, num_cars, car_truck_ratio, lock_limit, exit_distance, HV_ratio)
         return df_board_start
     
-    def generate_random_board(self, num_cars, car_truck_ratio, lock_limit, exit_distance):
-        self.setup_board(self.random_board_df(num_cars, car_truck_ratio, lock_limit, exit_distance))
+    def generate_random_board(self, num_cars, car_truck_ratio, lock_limit, exit_distance, HV_ratio):
+        """
+        Generates a random board and immediately sets it up.
+
+        Parameters
+        ----------
+            size int : Size of the board.
+            num_cars int : Number of cars on the board.
+            car_truck_ratio tuple : Ratio of cars to trucks.
+            lock_limit int : Minimum number of open spaces in column or row
+            before it is considered locked. Higher values result in easier boards.
+            HV_ratio tuple : Ratio of horizontal to vertical cars.
+        """
+        self.setup_board(self.random_board_df(num_cars, car_truck_ratio, lock_limit, exit_distance, HV_ratio))
 
     def is_won(self):
         """

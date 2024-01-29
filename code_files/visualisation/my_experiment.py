@@ -12,7 +12,7 @@ from tqdm import tqdm
 from itertools import product
 
 class Experiment:
-    def __init__(self, size, size_range, num_cars, num_cars_range=1, car_truck_ratio=3, car_truck_range=1 ,lock_limit=1, lock_limit_range=1, min_exit_distance=2, move_max=10000, num_runs=1000):
+    def __init__(self, size, num_cars, algorithms=[], size_range=1, num_cars_range=1, car_truck_ratio=(3,1), car_truck_range=(1,1), HV_ratio=(1,1), HV_ratio_range=(1,1), lock_limit=1, lock_limit_range=1, min_exit_distance=2, move_max=10000, num_runs=1000):
         """
         Parameters
         ----------
@@ -20,7 +20,10 @@ class Experiment:
             size_range int : Range of the board size.
             num_cars int : Number of cars on the board.
             num_cars_range int : Range of the number of cars.
-            car_truck_ratio int : Ratio of cars to trucks.
+            car_truck_ratio tuple : Ratio of cars to trucks.
+            car_truck_range tuple : Range of the car-truck ratio.
+            HV_ratio tuple : Ratio of horizontal to vertical cars.
+            HV_ratio_range tuple : Range of the HV ratio.
             lock_limit int : Minimum number of open spaces in column or row
             before it is considered locked. Higher values result in easier boards.
             lock_limit_range int : Range of the lock limit.
@@ -34,17 +37,23 @@ class Experiment:
         self.num_cars_range = num_cars_range
         self.car_truck_ratio = car_truck_ratio
         self.car_truck_range = car_truck_range
+        self.HV_ratio = HV_ratio
+        self.HV_ratio_range = HV_ratio_range
         self.lock_limit = lock_limit
         self.lock_limit_range = lock_limit_range
         self.min_exit_distance = min_exit_distance
         self.move_max = move_max
         self.num_runs = num_runs
         self.df_data = pd.DataFrame(columns=['size', 'num_cars', 'algorithm', 'solved', 'lock_limit', 'moves'])
-        self.data = []
+        self.algorithms = ['random', 'no_reverse', 'breadth_first', 'depth_first', 'a_star'] if len(algorithms) == 0 else algorithms
 
-    def a_star(self):
+    def a_star(self, size, state, cars, lock_lim):
+        #astar_board = Board(size)
+        #astar_board.setup_board(state)
+        #astar_board.astar_solve()
+        #self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'A_star', 'solved': astar_board.is_won(), 'lock_limit': lock_lim, 'moves': astar_board.iterations})
         pass
-
+    
     def breadth_first(self, size, state, cars, lock_lim):
         breadth_board = Board(size)
         breadth_board.setup_board(state)
@@ -75,13 +84,34 @@ class Experiment:
         pass
 
     def plot(self):
-        pass
+        sns.set_theme(style="darkgrid")
+        sns.pairplot(self.df_data, hue='algorithm')
+        plt.savefig("test_data.png")
 
     def save(self):
         pass
 
     def run(self):
-        pass
+        self.data = []
+        sizes = range(self.size, self.size + self.size_range)
+        cars_range = range(self.num_cars, self.num_cars + self.num_cars_range)
+        lock_limits = range(self.lock_limit, self.lock_limit + self.lock_limit_range)
+
+        for i in tqdm(range(self.num_runs)):
+            for size, cars, lock_lim in product(sizes, cars_range, lock_limits):
+                initial_state = Board.random_board_df(size, cars, self.car_truck_ratio, lock_lim, self.min_exit_distance, self.HV_ratio)
+                for algorithm in self.algorithms:
+                    if algorithm == 'random':
+                        self.randomise(size, initial_state, cars, lock_lim)
+                    elif algorithm == 'no_reverse':
+                        self.no_reverse(size, initial_state, cars, lock_lim)
+                    elif algorithm == 'breadth_first':
+                        self.breadth_first(size, initial_state, cars, lock_lim)
+                    elif algorithm == 'depth_first':
+                        self.depth_first(size, initial_state, cars, lock_lim)
+                    elif algorithm == 'a_star':
+                        self.a_star(size, initial_state, cars, lock_lim)
+        self.df_data = pd.DataFrame(self.data)
 
     def run_all(self):
         sizes = range(self.size, self.size + self.size_range)
@@ -91,7 +121,7 @@ class Experiment:
 
         for i in tqdm(range(self.num_runs)):
             for size, cars, lock_lim, ratio in product(sizes, cars_range, lock_limits, ratios):
-                initial_state = Board.random_board_df(size, cars, ratio, lock_lim, self.min_exit_distance)
+                initial_state = Board.random_board_df(size, cars, ratio, lock_lim, self.min_exit_distance, self.HV_ratio)
                 # Random
                 self.randomise(size, initial_state, cars, lock_lim)
                 print("Random done")
@@ -105,10 +135,8 @@ class Experiment:
                 self.depth_first(size, initial_state, cars, lock_lim)
                 print("Depth_first done")
                 # A_star
-                #a_star_board = Board(size)
-                #a_star_board.setup_board(initial_state)
-                #a_star_board.a_star_search()
-                #self.df_data.append({'size': size, 'num_cars': cars, 'algorithm': 'A_star', 'solved': a_star_board.is_won, 'lock_limit': lock_lim, 'moves': a_star_board.iterations})
+                self.a_star(size, initial_state, cars, lock_lim)
+                print("A_star done")
         self.df_data = pd.DataFrame(self.data)
 
     def export(self):

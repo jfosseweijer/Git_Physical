@@ -72,7 +72,7 @@ def place_car(car, col, row, orientation, length, direction, position_array, x_c
     else:
         raise ValueError("Car does not fit on the board")
 
-def random_board(size, num_cars, car_truck_ratio, lock_limit, exit_distance):
+def random_board(size, num_cars, car_truck_ratio, lock_limit, exit_distance, HV_ratio=(1,1)):
     """
     Generates a random board. Fingers crossed it's solvable.
 
@@ -111,8 +111,8 @@ def random_board(size, num_cars, car_truck_ratio, lock_limit, exit_distance):
 
     # Car parameters
     directions = [-1, 1]
-    orientations = ['H', 'V']
-    lengths = [2 for _ in range(car_truck_ratio)] + [3]
+    orientations = ['H' for _ in range(HV_ratio[0])] + ['V' for _ in range(HV_ratio[1])]
+    lengths = [2 for _ in range(car_truck_ratio[0])] + [3 for _ in range(car_truck_ratio[1])]
 
     placed = 0
     errors = 0
