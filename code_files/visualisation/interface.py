@@ -1,13 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, simpledialog
 from ttkthemes import ThemedStyle 
 from PIL import Image, ImageTk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from ..classes.stack import Stack
 from code_files.visualisation.int_vis import plot as visualize
+from code_files.visualisation.visualize import plot as figure
 from code_files.classes.board_setup import Board as Board
 from ..algorithms.no_reverse import random_without_reverse
 from ..algorithms.breadth_search import breadth_search
@@ -59,7 +60,10 @@ class Interface:
 
         # Set the menu
         visualization_choice = ttk.Combobox(master=self.master, textvariable=self.vis_var, values=options)
-        visualization_choice.pack(pady=10)
+        visualization_choice.pack(pady = 10)
+
+        button = tk.Button(master = self.master, text = "save figure", command = self.input_prompt)
+        button.pack(pady = 10, after = visualization_choice)
 
         # Create the label for the image once during initialization
         self.image_label = tk.Label(self.master)
@@ -69,19 +73,19 @@ class Interface:
         self.load_image()  
 
         # Buttons for different functionalities
-        user_button = ttk.Button(master=self.master, text="depth_search", command=lambda: self.algorithm(int(image_menu.get()[-1])-1, alg_type='depth', visual=visualization_choice.get()))
+        user_button = ttk.Button(master = self.master, text = "depth_search", command = lambda: self.algorithm(int(image_menu.get()[-1])-1, alg_type = 'depth', visual = visualization_choice.get()))
         user_button.pack(side=tk.BOTTOM, fill=tk.X)
 
-        algorithm_button = ttk.Button(master=self.master, text="breadth_search", command=lambda: self.algorithm(int(image_menu.get()[-1])-1, alg_type='breadth', visual=visualization_choice.get()))
+        algorithm_button = ttk.Button(master = self.master, text = "breadth_search", command = lambda: self.algorithm(int(image_menu.get()[-1])-1, alg_type = 'breadth', visual = visualization_choice.get()))
         algorithm_button.pack(side=tk.BOTTOM, fill=tk.X)
 
-        algorithm_button = ttk.Button(master=self.master, text="Not reversing random algorithm", command=lambda: self.algorithm(int(image_menu.get()[-1])-1, alg_type='non-reverse', visual=visualization_choice.get()))
+        algorithm_button = ttk.Button(master = self.master, text = "Not reversing random algorithm", command = lambda: self.algorithm(int(image_menu.get()[-1])-1, alg_type = 'non-reverse', visual = visualization_choice.get()))
         algorithm_button.pack(side=tk.BOTTOM, fill=tk.X)
 
-        random_button = ttk.Button(master=self.master, text="Random", command=lambda: self.algorithm(int(image_menu.get()[-1])-1, alg_type='random', visual=visualization_choice.get()))
+        random_button = ttk.Button(master = self.master, text = "Random", command = lambda: self.algorithm(int(image_menu.get()[-1])-1, alg_type = 'random', visual = visualization_choice.get()))
         random_button.pack(side=tk.BOTTOM, fill=tk.X)
 
-        user_button = ttk.Button(master=self.master, text="User", command=lambda: self.create_user(int(image_menu.get()[-1])-1))
+        user_button = ttk.Button(master = self.master, text = "User", command = lambda: self.create_user(int(image_menu.get()[-1])-1))
         user_button.pack(side=tk.BOTTOM, fill=tk.X)
 
     def create_user(self, board_number):
@@ -203,6 +207,10 @@ class Interface:
             made_moves = {}
             move = (None, 0, None, history, made_moves)
 
+        # Save the initial figure
+        if self.input_name:
+            figure(self.board.vehicles_list, self.board.size, self.board.exit, self.input_name)
+
         # Record the start time
         start = time.time()
 
@@ -246,14 +254,27 @@ class Interface:
             if alg_type == 'breadth':
                 move[3].append((self.board, (move[0], move[1], move[2])))
 
-            # Check for a winner and update visualization speed
+            # Check if the game is complete and calculate the time
             if visual == 'no visualisation':
                 self.check_winner(move[0], time.time() - start)
             else:
                 self.check_winner(move[0], time.time() - start - iterations * 0.2)
+        
+        # Save the final figure
+        if self.output_name:
+            figure(self.board.vehicles_list, self.board.size, self.board.exit, self.output_name)
 
         # Clear the interface after algorithm completion
         self.clear_interface()
+    
+    def input_prompt(self):
+        # Ask the user for input using a dialog box
+        user_input = simpledialog.askstring("Input", "Return filenames: 'input, output'")
+        
+        try:
+            self.input_name, self.output_name = user_input.split(',')
+        except ValueError:
+            self.display_text('Inputs not valid', error = True)
 
     def display_text(self, text_message, error=False, move=False):
         """
