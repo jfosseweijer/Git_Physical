@@ -69,6 +69,7 @@ class Board:
         self.nested_vehicle_positions = []
         self.size = size
         self.show_board = show_board
+        self.iterations = 0
 
     def setup_board(self, gameboard):
         """
@@ -216,67 +217,67 @@ class Board:
         return self.vehicles_list, self.size, self.exit
     
     def random_solve(self):
-        iterations = 0
-        while not self.is_won() and iterations < 1000000:
-            self.print_board()
-            iterations += 1
+        self.iterations = 0
+        while not self.is_won() and self.iterations < 1e6:
+            #self.print_board()
+            self.iterations += 1
             name, movement, position = random_step(self)
             vehicle = self.find_vehicle(name)
             self.update_positions_set(vehicle, position)
-            time.sleep(0.05)
-            print(name, movement)
+            #time.sleep(0.05)
+            #print(name, movement)
 
         if self.is_won():
-            print(f"Game is won in {iterations} moves")
+            print(f"Game is won in {self.iterations} moves")
         else:
-            print(f"Game not solved after {iterations} moves")
+            print(f"Game not solved after {self.iterations} moves")
 
     def no_reverse_solve(self):
-        iterations = 0
+        self.iterations = 0
         move = (None, 0, None)
-        while not self.is_won() and iterations < 1000000:
-            self.print_board()
-            iterations += 1
+        while not self.is_won() and self.iterations < 1e6:
+            #self.print_board()
+            self.iterations += 1
             move = random_without_reverse(self, move)
             vehicle = self.find_vehicle(move[0])
             self.update_positions_set(vehicle, move[2])
-            time.sleep(0.05)
-            print(move[0], move[1])
+            #time.sleep(0.05)
+            #print(move[0], move[1])
             
         if self.is_won():
-            print(f"Game is won in {iterations} moves")
+            print(f"Game is won in {self.iterations} moves")
         else:
-            print(f"Game not solved after {iterations} moves")
+            print(f"Game not solved after {self.iterations} moves")
 
     def depth_search(self):
-        iterations = 0
-        bottom = 100
+        self.iterations = 0
+        bottom = 50
         history = Stack()
         made_moves = {}
-        while not self.is_won() and iterations < 100000:
+        while not self.is_won() and self.iterations < 1e5:
             #self.print_board()
-            iterations += 1
+            self.iterations += 1
             name, movement, position, history, made_moves = depth_search(self, history, made_moves, bottom)
             vehicle = self.find_vehicle(name)
             self.update_positions_set(vehicle, position)
             #time.sleep(0.05)
-            print(name, movement)
+            #print(name, movement)
             
         if self.is_won():
-            print(f"Game is won in {iterations} moves")
+            print(f"Game is won in {self.iterations} moves")
         else:
-            print(f"Game not solved after {iterations} moves")
+            print(f"Game not solved after {self.iterations} moves")
 
     def breadth_search(self):
-        iterations = 0
+        self.iterations = 0
         current_layer_boards = []
         current_layer_index = None
         former_layer_boards = [(self, (None, None, None))]
         former_layer_index = 0
         board: Board = copy.deepcopy(former_layer_boards[former_layer_index][0])
         board.print_board()
-        while not board.is_won() and iterations < 1000000:
-            iterations += 1
+        while not board.is_won() and self.iterations < 1e5:
+            self.iterations += 1
             name, movement, position, current_layer_boards, current_layer_index, former_layer_boards, former_layer_index = breadth_search(current_layer_boards, current_layer_index, former_layer_boards, former_layer_index)
             board: Board = copy.deepcopy(former_layer_boards[former_layer_index][0])
             vehicle = board.find_vehicle(name)
@@ -285,20 +286,54 @@ class Board:
             #board.print_board()
             #time.sleep(0.05)
             #print(name, movement)
-            if iterations % 1000 == 0:
-                print(iterations)
+            #if self.iterations % 1000 == 0:
+            #    print(self.iterations)
 
         if board.is_won():
-            print(f"Game is won in {iterations} moves")
+            print(f"Game is won in {self.iterations} moves")
         else:
-            print(f"Game not solved after {iterations} moves")
+            print(f"Game not solved after {self.iterations} moves")
 
     def astar_solve(self):
         pass
+
+    def random_board_df(size, num_cars, car_truck_ratio, lock_limit, exit_distance, HV_ratio):
+        """
+        Returns a random board as a DataFrame.
+        Sometimes we want just the dataframe, so we can set up
+        multiple boards at with the same initial state.
+
+        Parameters
+        ----------
+            size int : Size of the board.
+            num_cars int : Number of cars on the board.
+            car_truck_ratio tuple : Ratio of cars to trucks.
+            lock_limit int : Minimum number of open spaces in column or row
+            before it is considered locked. Higher values result in easier boards.
+            HV_ratio tuple : Ratio of horizontal to vertical cars.
+        
+        Returns
+        -------
+            initial_state pd.DataFrame : Initial state of the board.
+            can be used to fill the board class with .set_board()
+        """
+        df_board_start = generator.random_board(size, num_cars, car_truck_ratio, lock_limit, exit_distance, HV_ratio)
+        return df_board_start
     
-    def generate_random_board(self, num_cars, car_truck_ratio, lock_limit, exit_distance):
-        df_board_start = generator.random_board(self.size, num_cars, car_truck_ratio, lock_limit, exit_distance)
-        self.setup_board(df_board_start)
+    def generate_random_board(self, num_cars, car_truck_ratio, lock_limit, exit_distance, HV_ratio):
+        """
+        Generates a random board and immediately sets it up.
+
+        Parameters
+        ----------
+            size int : Size of the board.
+            num_cars int : Number of cars on the board.
+            car_truck_ratio tuple : Ratio of cars to trucks.
+            lock_limit int : Minimum number of open spaces in column or row
+            before it is considered locked. Higher values result in easier boards.
+            HV_ratio tuple : Ratio of horizontal to vertical cars.
+        """
+        self.setup_board(self.random_board_df(num_cars, car_truck_ratio, lock_limit, exit_distance, HV_ratio))
 
     def is_won(self):
         """
