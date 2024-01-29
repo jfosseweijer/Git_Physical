@@ -216,9 +216,9 @@ class Board:
     def plot_information(self):
         return self.vehicles_list, self.size, self.exit
     
-    def random_solve(self):
+    def random_solve(self, move_max=10000):
         self.iterations = 0
-        while not self.is_won() and self.iterations < 1e6:
+        while not self.is_won() and self.iterations < move_max:
             #self.print_board()
             self.iterations += 1
             name, movement, position = random_step(self)
@@ -232,10 +232,10 @@ class Board:
         else:
             print(f"Game not solved after {self.iterations} moves")
 
-    def no_reverse_solve(self):
+    def no_reverse_solve(self, move_max=10000):
         self.iterations = 0
         move = (None, 0, None)
-        while not self.is_won() and self.iterations < 1e6:
+        while not self.is_won() and self.iterations < move_max:
             #self.print_board()
             self.iterations += 1
             move = random_without_reverse(self, move)
@@ -249,12 +249,12 @@ class Board:
         else:
             print(f"Game not solved after {self.iterations} moves")
 
-    def depth_search(self):
+    def depth_search(self, move_max=10000):
         self.iterations = 0
         bottom = 50
         history = Stack()
         made_moves = {}
-        while not self.is_won() and self.iterations < 1e5:
+        while not self.is_won() and self.iterations < move_max:
             #self.print_board()
             self.iterations += 1
             name, movement, position, history, made_moves = depth_search(self, history, made_moves, bottom)
@@ -268,7 +268,7 @@ class Board:
         else:
             print(f"Game not solved after {self.iterations} moves")
 
-    def breadth_search(self):
+    def breadth_search(self, move_max=10000):
         self.iterations = 0
         current_layer_boards = []
         current_layer_index = None
@@ -276,7 +276,7 @@ class Board:
         former_layer_index = 0
         board: Board = copy.deepcopy(former_layer_boards[former_layer_index][0])
         #board.print_board()
-        while not board.is_won() and self.iterations < 1e5:
+        while not board.is_won() and self.iterations < move_max:
             self.iterations += 1
             name, movement, position, current_layer_boards, current_layer_index, former_layer_boards, former_layer_index = breadth_search(current_layer_boards, current_layer_index, former_layer_boards, former_layer_index)
             board: Board = copy.deepcopy(former_layer_boards[former_layer_index][0])
@@ -297,7 +297,7 @@ class Board:
             print(f"Game not solved after {self.iterations} moves")
             self.won = False
 
-    def astar_solve(self):
+    def astar_solve(self, move_max=10000):
         pass
 
     def random_board_df(size, num_cars, car_truck_ratio, lock_limit, exit_distance, HV_ratio):

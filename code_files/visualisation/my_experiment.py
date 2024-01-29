@@ -7,17 +7,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+import time
+from datetime import datetime
 from ..classes.board_setup import Board
 from tqdm import tqdm
 from itertools import product
 
+
 class Experiment:
-    def __init__(self, size, num_cars, algorithms=[], size_range=1, num_cars_range=1, car_truck_ratio=(3,1), car_truck_range=(1,1), HV_ratio=(1,1), HV_ratio_range=(1,1), lock_limit=1, lock_limit_range=1, min_exit_distance=2, move_max=10000, num_runs=1000):
+    def __init__(self, size, num_cars, algorithms=[], size_range=[6], num_cars_range=1, car_truck_ratio=(3,1), car_truck_range=(1,1), HV_ratio=(1,1), HV_ratio_range=(1,1), lock_limit=1, lock_limit_range=1, min_exit_distance=2, move_max=10000, num_runs=1000):
         """
         Parameters
         ----------
             size int : Size of the board.
-            size_range int : Range of the board size.
+            size_range list : Range of the size of the board.
             num_cars int : Number of cars on the board.
             num_cars_range int : Range of the number of cars.
             car_truck_ratio tuple : Ratio of cars to trucks.
@@ -45,23 +48,28 @@ class Experiment:
         self.move_max = move_max
         self.num_runs = num_runs
         self.df_data = pd.DataFrame(columns=['size', 'num_cars', 'algorithm', 'solved', 'lock_limit', 'moves'])
+        pd.option_context('mode.use_inf_as_na', True)
         self.algorithms = algorithms if len(algorithms) != 0 else ['random', 'no_reverse', 'breadth_first', 'depth_first', 'a_star']
         self.unsolved = []
 
     def a_star(self, size, state, cars, lock_lim):
         #astar_board = Board(size)
         #astar_board.setup_board(state)
-        #astar_board.astar_solve()
-        #self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'A_star', 'solved': astar_board.is_won(), 'lock_limit': lock_lim, 'moves': astar_board.iterations})
-        #if not astar_board.is_won():
+        #start_time = time.time()
+        #astar_board.a_star(self.move_max)
+        #end_time = time.time()
+        #self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'A_star', 'solved': astar_board.won, 'lock_limit': lock_lim, 'moves': astar_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
+        #if not astar_board.won:
         #    self.unsolved.append({'A_star': astar_board})
         pass
     
     def breadth_first(self, size, state, cars, lock_lim):
         breadth_board = Board(size)
         breadth_board.setup_board(state)
-        breadth_board.breadth_search()
-        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Breadth-first', 'solved': breadth_board.won, 'lock_limit': lock_lim, 'moves': breadth_board.iterations})
+        start_time = time.time()  
+        breadth_board.breadth_search(self.move_max)
+        end_time = time.time()  
+        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Breadth-first', 'solved': breadth_board.won, 'lock_limit': lock_lim, 'moves': breadth_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
         if not breadth_board.won:
             self.unsolved.append({'Breadth-first': breadth_board})
 
@@ -69,40 +77,66 @@ class Experiment:
     def depth_first(self, size, state, cars, lock_lim):
         depth_board = Board(size)
         depth_board.setup_board(state)
-        depth_board.depth_search()
-        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Depth-first', 'solved': depth_board.is_won(), 'lock_limit': lock_lim, 'moves': depth_board.iterations})
-        if not depth_board.won():
+        start_time = time.time()  
+        depth_board.depth_search(self.move_max)
+        end_time = time.time()  
+        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Depth-first', 'solved': depth_board.is_won(), 'lock_limit': lock_lim, 'moves': depth_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
+        if not depth_board.is_won():
             self.unsolved.append({'Depth-first': depth_board})
 
 
     def randomise(self, size, state, cars, lock_lim):
         random_board = Board(size)
         random_board.setup_board(state)
-        random_board.random_solve()
-        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Random', 'solved': random_board.is_won(), 
-        'lock_limit': lock_lim, 'moves': random_board.iterations})
+        start_time = time.time()
+        random_board.random_solve(self.move_max)
+        end_time = time.time()
+        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Random', 'solved': random_board.is_won(), 'lock_limit': lock_lim, 'moves': random_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
         if not random_board.is_won():
             self.unsolved.append({'Random': random_board})
 
     def no_reverse(self, size, state, cars, lock_lim):
         no_reverse_board = Board(size)
         no_reverse_board.setup_board(state)
-        no_reverse_board.no_reverse_solve()
-        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'No_reverse', 'solved': no_reverse_board.is_won(), 
-        'lock_limit': lock_lim, 'moves': no_reverse_board.iterations})   
+        start_time = time.time()
+        no_reverse_board.no_reverse_solve(self.move_max)
+        end_time = time.time()
+        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'No_reverse', 'solved': no_reverse_board.is_won(), 'lock_limit': lock_lim, 'moves': no_reverse_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
         if not no_reverse_board.is_won():
-            self.unsolved.append({'No_reverse': no_reverse_board})    
+            self.unsolved.append({'No_reverse': no_reverse_board})
 
     def histogram(self):
         pass
 
-    def plot(self):
+    def lmplot(self):
         sns.set_theme(style="darkgrid")
-        sns.scatterplot(self.df_data, hue='algorithm')
-        plt.savefig("test_data.png")
+        sns.lmplot(data=self.df_data, x="moves", y="time",
+             hue="algorithm", col="algorithm", col_wrap=2,)
+        plt.savefig("lmplot_test_data.png")
+    
+    def catplot(self):
+        sns.set_theme(style="darkgrid")
+        sns.catplot(data=self.df_data, x="algorithm", y="moves", hue="solved", kind="bar")
+        plt.savefig("catplot_test_data.png")
 
-    def save(self):
-        pass
+    def save(self, path=None): 
+        now = datetime.now()  # Get the current date and time
+        date_time = now.strftime("%m-%d_%H:%M")  # Format it as a string
+
+        if path is None:
+            new_path = f"data/experiments/test{date_time}.csv"
+        else:
+            # Split the path into the directory and the filename
+            directory, filename = os.path.split(path)
+            # Split the filename into the name and the extension
+            name, extension = os.path.splitext(filename)
+            # Append the date and time to the name
+            new_filename = f"{name}_{date_time}{extension}"
+            # Combine the directory and the new filename into the new path
+            new_path = os.path.join(directory, new_filename)
+
+        self.df_data.to_csv(new_path)
+        
 
     def run(self):
         self.data = []
