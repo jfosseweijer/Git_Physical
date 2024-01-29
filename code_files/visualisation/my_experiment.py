@@ -45,26 +45,35 @@ class Experiment:
         self.move_max = move_max
         self.num_runs = num_runs
         self.df_data = pd.DataFrame(columns=['size', 'num_cars', 'algorithm', 'solved', 'lock_limit', 'moves'])
-        self.algorithms = ['random', 'no_reverse', 'breadth_first', 'depth_first', 'a_star'] if len(algorithms) == 0 else algorithms
+        self.algorithms = algorithms if len(algorithms) != 0 else ['random', 'no_reverse', 'breadth_first', 'depth_first', 'a_star']
+        self.unsolved = []
 
     def a_star(self, size, state, cars, lock_lim):
         #astar_board = Board(size)
         #astar_board.setup_board(state)
         #astar_board.astar_solve()
         #self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'A_star', 'solved': astar_board.is_won(), 'lock_limit': lock_lim, 'moves': astar_board.iterations})
+        #if not astar_board.is_won():
+        #    self.unsolved.append({'A_star': astar_board})
         pass
     
     def breadth_first(self, size, state, cars, lock_lim):
         breadth_board = Board(size)
         breadth_board.setup_board(state)
         breadth_board.breadth_search()
-        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Breadth-first', 'solved': breadth_board.is_won(), 'lock_limit': lock_lim, 'moves': breadth_board.iterations})
+        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Breadth-first', 'solved': breadth_board.won, 'lock_limit': lock_lim, 'moves': breadth_board.iterations})
+        if not breadth_board.won:
+            self.unsolved.append({'Breadth-first': breadth_board})
+
 
     def depth_first(self, size, state, cars, lock_lim):
         depth_board = Board(size)
         depth_board.setup_board(state)
         depth_board.depth_search()
         self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Depth-first', 'solved': depth_board.is_won(), 'lock_limit': lock_lim, 'moves': depth_board.iterations})
+        if not depth_board.won():
+            self.unsolved.append({'Depth-first': depth_board})
+
 
     def randomise(self, size, state, cars, lock_lim):
         random_board = Board(size)
@@ -72,20 +81,24 @@ class Experiment:
         random_board.random_solve()
         self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Random', 'solved': random_board.is_won(), 
         'lock_limit': lock_lim, 'moves': random_board.iterations})
+        if not random_board.is_won():
+            self.unsolved.append({'Random': random_board})
 
     def no_reverse(self, size, state, cars, lock_lim):
         no_reverse_board = Board(size)
         no_reverse_board.setup_board(state)
         no_reverse_board.no_reverse_solve()
         self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'No_reverse', 'solved': no_reverse_board.is_won(), 
-        'lock_limit': lock_lim, 'moves': no_reverse_board.iterations})       
+        'lock_limit': lock_lim, 'moves': no_reverse_board.iterations})   
+        if not no_reverse_board.is_won():
+            self.unsolved.append({'No_reverse': no_reverse_board})    
 
     def histogram(self):
         pass
 
     def plot(self):
         sns.set_theme(style="darkgrid")
-        sns.pairplot(self.df_data, hue='algorithm')
+        sns.scatterplot(self.df_data, hue='algorithm')
         plt.savefig("test_data.png")
 
     def save(self):

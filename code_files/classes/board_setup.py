@@ -275,7 +275,7 @@ class Board:
         former_layer_boards = [(self, (None, None, None))]
         former_layer_index = 0
         board: Board = copy.deepcopy(former_layer_boards[former_layer_index][0])
-        board.print_board()
+        #board.print_board()
         while not board.is_won() and self.iterations < 1e5:
             self.iterations += 1
             name, movement, position, current_layer_boards, current_layer_index, former_layer_boards, former_layer_index = breadth_search(current_layer_boards, current_layer_index, former_layer_boards, former_layer_index)
@@ -291,8 +291,11 @@ class Board:
 
         if board.is_won():
             print(f"Game is won in {self.iterations} moves")
+            # Heb deze variabel nodig want: while board.is_won() en niet while self.is_won()
+            self.won = True
         else:
             print(f"Game not solved after {self.iterations} moves")
+            self.won = False
 
     def astar_solve(self):
         pass
