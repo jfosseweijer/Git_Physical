@@ -24,6 +24,8 @@ def breadth_search(current_layer_boards: list, current_layer_index, former_layer
         current_layer_index = None
         current_layer_boards.clear()
 
+    print(f"Lenght{len(former_layer_boards)}")
+    print(f"Index {former_layer_index}")
     board = former_layer_boards[former_layer_index][0]
 
     options = []
