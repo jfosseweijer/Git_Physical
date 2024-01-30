@@ -1,4 +1,3 @@
-import os
 from code_files.visualisation.my_experiment import Experiment
 
 
@@ -8,9 +7,10 @@ from code_files.visualisation.my_experiment import Experiment
 
 algoririthm = []
 
-experiment = Experiment(size=6, size_range=1, num_cars=6, num_cars_range=10, num_runs=1000, move_max=5000)
+experiment = Experiment(size=9, size_range=1, num_cars=18, num_cars_range=10, num_runs=1000, move_max=500, HV_ratio=(1,1))
 experiment.run()
 print(experiment.df_data)
-experiment.save()
+experiment.save(path='data/experiments/HV_1:3.csv')
 #experiment.lmplot()
 #experiment.catplot()
+

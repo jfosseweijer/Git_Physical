@@ -2,7 +2,6 @@
 Experiment class for generating data.
 """
 
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -129,12 +128,14 @@ class Experiment:
         pass
 
     def lmplot(self):
+        plt.clf()
         sns.set_theme(style="darkgrid")
         sns.lmplot(data=self.df_data, x="moves", y="time",
              hue="algorithm", col="algorithm", col_wrap=2,)
         plt.savefig("lmplot_test_data.png")
     
     def catplot(self):
+        plt.clf()
         sns.set_theme(style="darkgrid")
         sns.catplot(data=self.df_data, x="algorithm", y="moves", hue="solved", kind="bar")
         plt.savefig("catplot_test_data.png")
@@ -146,14 +147,7 @@ class Experiment:
         if path is None:
             new_path = f"data/experiments/test{date_time}.csv"
         else:
-            # Split the path into the directory and the filename
-            directory, filename = os.path.split(path)
-            # Split the filename into the name and the extension
-            name, extension = os.path.splitext(filename)
-            # Append the date and time to the name
-            new_filename = f"{name}_{date_time}{extension}"
-            # Combine the directory and the new filename into the new path
-            new_path = os.path.join(directory, new_filename)
+            new_path = path
 
         self.df_data.to_csv(new_path)
         
@@ -180,31 +174,6 @@ class Experiment:
                         self.a_star(size, initial_state, cars, lock_lim)
         self.df_data = pd.DataFrame(self.data)
 
-    def run_all(self):
-        sizes = range(self.size, self.size + self.size_range)
-        cars_range = range(self.num_cars, self.num_cars + self.num_cars_range)
-        lock_limits = range(self.lock_limit, self.lock_limit + self.lock_limit_range)
-        ratios = range(self.car_truck_ratio, self.car_truck_ratio + self.car_truck_range)
-
-        for i in tqdm(range(self.num_runs)):
-            for size, cars, lock_lim, ratio in product(sizes, cars_range, lock_limits, ratios):
-                initial_state = Board.random_board_df(size, cars, ratio, lock_lim, self.min_exit_distance, self.HV_ratio)
-                # Random
-                self.randomise(size, initial_state, cars, lock_lim)
-                print("Random done")
-                # No_reverse
-                self.no_reverse(size, initial_state, cars, lock_lim)
-                print("No_reverse done")
-                # Breadt_first
-                self.breadth_first(size, initial_state, cars, lock_lim)
-                print("Breadth_first done")
-                # Depth_first
-                self.depth_first(size, initial_state, cars, lock_lim)
-                print("Depth_first done")
-                # A_star
-                self.a_star(size, initial_state, cars, lock_lim)
-                print("A_star done")
-        self.df_data = pd.DataFrame(self.data)
 
     def export(self):
         pass
