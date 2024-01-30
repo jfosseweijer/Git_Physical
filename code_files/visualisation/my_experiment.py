@@ -15,12 +15,12 @@ from itertools import product
 
 
 class Experiment:
-    def __init__(self, size, num_cars, algorithms=[], size_range=[6], num_cars_range=1, car_truck_ratio=(3,1), car_truck_range=(1,1), HV_ratio=(1,1), HV_ratio_range=(1,1), lock_limit=1, lock_limit_range=1, min_exit_distance=2, move_max=10000, num_runs=1000):
+    def __init__(self, size, num_cars, algorithms=[], size_range=1, num_cars_range=1, car_truck_ratio=(3,1), car_truck_range=(1,1), HV_ratio=(1,1), HV_ratio_range=(1,1), lock_limit=1, lock_limit_range=1, min_exit_distance=2, move_max=10000, num_runs=1000):
         """
         Parameters
         ----------
             size int : Size of the board.
-            size_range list : Range of the size of the board.
+            size_range int : Range of the size of the board.
             num_cars int : Number of cars on the board.
             num_cars_range int : Range of the number of cars.
             car_truck_ratio tuple : Ratio of cars to trucks.
@@ -56,10 +56,14 @@ class Experiment:
         #astar_board = Board(size)
         #astar_board.setup_board(state)
         #start_time = time.time()
-        #astar_board.a_star(self.move_max)
+        #try:
+        #    astar_board.a_star_search(self.move_max)
+        #    solved = 'Solved' if astar_board.won else 'Unsolved'
+        #except ValueError:
+        #    solved = 'Locked'
         #end_time = time.time()
-        #self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'A_star', 'solved': astar_board.won, 'lock_limit': lock_lim, 'moves': astar_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
-        #if not astar_board.won:
+        #self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'A_star', 'solved': solved, 'lock_limit': lock_lim, 'moves': astar_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
+        #if solved != 'Solved':
         #    self.unsolved.append({'A_star': astar_board})
         pass
     
@@ -67,10 +71,14 @@ class Experiment:
         breadth_board = Board(size)
         breadth_board.setup_board(state)
         start_time = time.time()  
-        breadth_board.breadth_search(self.move_max)
+        try:
+            breadth_board.breadth_search(self.move_max)
+            solved = 'Solved' if breadth_board.won else 'Unsolved'
+        except ValueError:
+            solved = 'Locked'
         end_time = time.time()  
-        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Breadth-first', 'solved': breadth_board.won, 'lock_limit': lock_lim, 'moves': breadth_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
-        if not breadth_board.won:
+        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Breadth-first', 'solved': solved, 'lock_limit': lock_lim, 'moves': breadth_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
+        if solved != 'Solved':
             self.unsolved.append({'Breadth-first': breadth_board})
 
 
@@ -78,10 +86,14 @@ class Experiment:
         depth_board = Board(size)
         depth_board.setup_board(state)
         start_time = time.time()  
-        depth_board.depth_search(self.move_max)
+        try:
+            depth_board.depth_search(self.move_max)
+            solved = 'Solved' if depth_board.is_won() else 'Unsolved'
+        except ValueError:
+            solved = 'Locked'
         end_time = time.time()  
-        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Depth-first', 'solved': depth_board.is_won(), 'lock_limit': lock_lim, 'moves': depth_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
-        if not depth_board.is_won():
+        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Depth-first', 'solved': solved, 'lock_limit': lock_lim, 'moves': depth_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
+        if solved != 'Solved':
             self.unsolved.append({'Depth-first': depth_board})
 
 
@@ -89,20 +101,28 @@ class Experiment:
         random_board = Board(size)
         random_board.setup_board(state)
         start_time = time.time()
-        random_board.random_solve(self.move_max)
+        try:
+            random_board.random_solve(self.move_max)
+            solved = 'Solved' if random_board.is_won() else 'Unsolved'
+        except ValueError:
+            solved = 'Locked'
         end_time = time.time()
-        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Random', 'solved': random_board.is_won(), 'lock_limit': lock_lim, 'moves': random_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
-        if not random_board.is_won():
+        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Random', 'solved': solved, 'lock_limit': lock_lim, 'moves': random_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
+        if solved != 'Solved':
             self.unsolved.append({'Random': random_board})
 
     def no_reverse(self, size, state, cars, lock_lim):
         no_reverse_board = Board(size)
         no_reverse_board.setup_board(state)
         start_time = time.time()
-        no_reverse_board.no_reverse_solve(self.move_max)
+        try:
+            no_reverse_board.no_reverse_solve(self.move_max)
+            solved = 'Solved' if no_reverse_board.is_won() else 'Unsolved'
+        except ValueError:
+            solved = 'Locked'
         end_time = time.time()
-        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'No_reverse', 'solved': no_reverse_board.is_won(), 'lock_limit': lock_lim, 'moves': no_reverse_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
-        if not no_reverse_board.is_won():
+        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'No_reverse', 'solved': solved, 'lock_limit': lock_lim, 'moves': no_reverse_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
+        if solved != 'Solved':
             self.unsolved.append({'No_reverse': no_reverse_board})
 
     def histogram(self):
