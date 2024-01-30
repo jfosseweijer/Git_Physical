@@ -274,6 +274,7 @@ class Board:
         current_layer_index = None
         former_layer_boards = [(self, (None, None, None))]
         former_layer_index = 0
+        played_boards = []
         board: Board = copy.deepcopy(former_layer_boards[former_layer_index][0])
         #board.print_board()
         while not board.is_won() and self.iterations < move_max:
@@ -283,9 +284,9 @@ class Board:
             vehicle = board.find_vehicle(name)
             board.update_positions_set(vehicle, position)
             current_layer_boards.append((board, (name, movement, position)))
-            #board.print_board()
-            #time.sleep(0.05)
-            #print(name, movement)
+            board.print_board()
+            time.sleep(0.05)
+            print(name, movement)
             #if self.iterations % 1000 == 0:
             #    print(self.iterations)
 

@@ -68,6 +68,7 @@ if __name__ == "__main__":
     parser.add_argument("-as", "--astar_solver", action='store_true', help="set this flag to True, game will be solved using a a-star algorithm")
     parser.add_argument("-ds", "--deep_solver", action='store_true', help="set this flag to True, game will be solved using a deepsearch algorithm")
     parser.add_argument("-bs", "--broad_solver", action='store_true', help="set this flag to True, game will be solved using a broadsearch algorithm")
+    #parser.add_argument("-as", "--astar_solver", action='store_true', help="set this flag to True, game will be solved using an Astar algorithm")
 
 
     # Read arguments from command line
