@@ -8,13 +8,13 @@ import seaborn as sns
 import os
 import time
 from datetime import datetime
-from ..classes.board_setup import Board
+from .board_setup import Board
 from tqdm import tqdm
 from itertools import product
 
 
 class Experiment:
-    def __init__(self, size, num_cars, algorithms=[], size_range=1, num_cars_range=1, car_truck_ratio=(3,1), car_truck_range=(1,1), HV_ratio=(1,1), HV_ratio_range=(1,1), lock_limit=1, lock_limit_range=1, min_exit_distance=2, move_max=10000, num_runs=1000):
+    def __init__(self, size, num_cars, algorithms=[], size_range=1, num_cars_range=1, car_truck_ratio=(3,1), car_truck_range=(1,1), HV_ratio=(1,1), HV_ratio_range=(1,1), lock_limit=1, lock_limit_range=1, min_exit_distance=2, min_exit_distance_range=1, move_max=10000, num_runs=1000):
         """
         Parameters
         ----------
@@ -30,6 +30,7 @@ class Experiment:
             before it is considered locked. Higher values result in easier boards.
             lock_limit_range int : Range of the lock limit.
             min_exit_distance int : Minimal distance of the red car to the exit.
+            min_exit_distance_range int : Range of the min exit distance.
             move_max int : Maximum number of moves. If exceeded, the board is considered unsolvable.
             num_runs int : Number of runs.
         """
@@ -44,29 +45,15 @@ class Experiment:
         self.lock_limit = lock_limit
         self.lock_limit_range = lock_limit_range
         self.min_exit_distance = min_exit_distance
+        self.min_exit_distance_range = min_exit_distance_range
         self.move_max = move_max
         self.num_runs = num_runs
         self.df_data = pd.DataFrame(columns=['size', 'num_cars', 'algorithm', 'solved', 'lock_limit', 'moves'])
         pd.option_context('mode.use_inf_as_na', True)
         self.algorithms = algorithms if len(algorithms) != 0 else ['random', 'no_reverse', 'breadth_first', 'depth_first', 'a_star']
         self.unsolved = []
-
-    def a_star(self, size, state, cars, lock_lim):
-        #astar_board = Board(size)
-        #astar_board.setup_board(state)
-        #start_time = time.time()
-        #try:
-        #    astar_board.a_star_search(self.move_max)
-        #    solved = 'Solved' if astar_board.won else 'Unsolved'
-        #except ValueError:
-        #    solved = 'Locked'
-        #end_time = time.time()
-        #self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'A_star', 'solved': solved, 'lock_limit': lock_lim, 'moves': astar_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
-        #if solved != 'Solved':
-        #    self.unsolved.append({'A_star': astar_board})
-        pass
     
-    def breadth_first(self, size, state, cars, lock_lim):
+    def breadth_first(self, size, state, cars, lock_lim, exit_dist):
         breadth_board = Board(size)
         breadth_board.setup_board(state)
         start_time = time.time()  
@@ -76,12 +63,12 @@ class Experiment:
         except ValueError:
             solved = 'Locked'
         end_time = time.time()  
-        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Breadth-first', 'solved': solved, 'lock_limit': lock_lim, 'moves': breadth_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
+        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Breadth-first', 'solved': solved, 'lock_limit': lock_lim, 'moves': breadth_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max, 'car_truck_ratio': self.car_truck_ratio, 'HV_ratio': self.HV_ratio, 'min_exit_distance': exit_dist})
         if solved != 'Solved':
-            self.unsolved.append({'Breadth-first': breadth_board})
+            self.unsolved.append({'Breadth-first': state})
 
 
-    def depth_first(self, size, state, cars, lock_lim):
+    def depth_first(self, size, state, cars, lock_lim, exit_dist):
         depth_board = Board(size)
         depth_board.setup_board(state)
         start_time = time.time()  
@@ -91,12 +78,12 @@ class Experiment:
         except ValueError:
             solved = 'Locked'
         end_time = time.time()  
-        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Depth-first', 'solved': solved, 'lock_limit': lock_lim, 'moves': depth_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
+        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Depth-first', 'solved': solved, 'lock_limit': lock_lim, 'moves': depth_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max, 'car_truck_ratio': self.car_truck_ratio, 'HV_ratio': self.HV_ratio, 'min_exit_distance': exit_dist})
         if solved != 'Solved':
-            self.unsolved.append({'Depth-first': depth_board})
+            self.unsolved.append({'Depth-first': state})
 
 
-    def randomise(self, size, state, cars, lock_lim):
+    def randomise(self, size, state, cars, lock_lim, exit_dist):
         random_board = Board(size)
         random_board.setup_board(state)
         start_time = time.time()
@@ -106,11 +93,11 @@ class Experiment:
         except ValueError:
             solved = 'Locked'
         end_time = time.time()
-        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Random', 'solved': solved, 'lock_limit': lock_lim, 'moves': random_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
+        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'Random', 'solved': solved, 'lock_limit': lock_lim, 'moves': random_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max, 'car_truck_ratio': self.car_truck_ratio, 'HV_ratio': self.HV_ratio, 'min_exit_distance': exit_dist})
         if solved != 'Solved':
-            self.unsolved.append({'Random': random_board})
+            self.unsolved.append({'Random': state})
 
-    def no_reverse(self, size, state, cars, lock_lim):
+    def no_reverse(self, size, state, cars, lock_lim, exit_dist):
         no_reverse_board = Board(size)
         no_reverse_board.setup_board(state)
         start_time = time.time()
@@ -120,9 +107,9 @@ class Experiment:
         except ValueError:
             solved = 'Locked'
         end_time = time.time()
-        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'No_reverse', 'solved': solved, 'lock_limit': lock_lim, 'moves': no_reverse_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max})
+        self.data.append({'size': size, 'num_cars': cars, 'algorithm': 'No_reverse', 'solved': solved, 'lock_limit': lock_lim, 'moves': no_reverse_board.iterations, 'time': f"{end_time - start_time:.6f}", 'move_max': self.move_max, 'car_truck_ratio': self.car_truck_ratio, 'HV_ratio': self.HV_ratio, 'min_exit_distance': exit_dist})
         if solved != 'Solved':
-            self.unsolved.append({'No_reverse': no_reverse_board})
+            self.unsolved.append({'No_reverse': state})
 
     def histogram(self):
         pass
@@ -150,6 +137,18 @@ class Experiment:
             new_path = path
 
         self.df_data.to_csv(new_path)
+
+    def save_unsolved(self, path=None):
+        now = datetime.now()
+        date_time = now.strftime("%m-%d_%H:%M")
+
+        if path is None:
+            new_path = f"data/experiments/unsolved{date_time}.csv"
+        else:
+            new_path = path
+
+        df = pd.DataFrame(self.unsolved)
+        df.to_csv(new_path)
         
 
     def run(self):
@@ -157,21 +156,21 @@ class Experiment:
         sizes = range(self.size, self.size + self.size_range)
         cars_range = range(self.num_cars, self.num_cars + self.num_cars_range)
         lock_limits = range(self.lock_limit, self.lock_limit + self.lock_limit_range)
+        exit_distances = range(self.min_exit_distance, self.min_exit_distance + self.size_range)
 
         for i in tqdm(range(self.num_runs)):
-            for size, cars, lock_lim in product(sizes, cars_range, lock_limits):
-                initial_state = Board.random_board_df(size, cars, self.car_truck_ratio, lock_lim, self.min_exit_distance, self.HV_ratio)
+            for size, cars, lock_lim, exit_dist in product(sizes, cars_range, lock_limits, exit_distances):
+                initial_state = Board.random_board_df(size, cars, self.car_truck_ratio, lock_lim, exit_dist, self.HV_ratio)
                 for algorithm in self.algorithms:
                     if algorithm == 'random':
-                        self.randomise(size, initial_state, cars, lock_lim)
+                        self.randomise(size, initial_state, cars, lock_lim, exit_dist)
                     elif algorithm == 'no_reverse':
-                        self.no_reverse(size, initial_state, cars, lock_lim)
+                        self.no_reverse(size, initial_state, cars, lock_lim, exit_dist)
                     elif algorithm == 'breadth_first':
-                        self.breadth_first(size, initial_state, cars, lock_lim)
+                        self.breadth_first(size, initial_state, cars, lock_lim, exit_dist)
                     elif algorithm == 'depth_first':
-                        self.depth_first(size, initial_state, cars, lock_lim)
-                    elif algorithm == 'a_star':
-                        self.a_star(size, initial_state, cars, lock_lim)
+                        self.depth_first(size, initial_state, cars, lock_lim, exit_dist)
+
         self.df_data = pd.DataFrame(self.data)
 
 

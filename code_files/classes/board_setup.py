@@ -284,9 +284,9 @@ class Board:
             vehicle = board.find_vehicle(name)
             board.update_positions_set(vehicle, position)
             current_layer_boards.append((board, (name, movement, position)))
-            board.print_board()
-            time.sleep(0.05)
-            print(name, movement)
+            #board.print_board()
+            #time.sleep(0.05)
+            #print(name, movement)
             #if self.iterations % 1000 == 0:
             #    print(self.iterations)
 
