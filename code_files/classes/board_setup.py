@@ -1,6 +1,5 @@
 import numpy as np
 import itertools
-import time
 import copy
 from ..algorithms import generator as generator
 from ..classes.queue import Queue as Queue

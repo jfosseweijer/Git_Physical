@@ -18,6 +18,7 @@
   - tkinter
   - PIL
   - ttkthemes
+  - copy
 
 
 Description:

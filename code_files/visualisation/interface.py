@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import tkinter as tk
 from tkinter import ttk, simpledialog
 from ttkthemes import ThemedStyle 
