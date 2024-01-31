@@ -9,6 +9,7 @@
   - matplotlib.backends.backend_tkagg
   - seaborn
   - itertools
+  - string
   - time
   - datetime
   - tqdm
@@ -18,37 +19,76 @@
   - PIL
   - ttkthemes
 
-Instructies voor het verzamelen van resultaten met willekeurige borden:
 
-1. Data genereren gaat met bijv. `python generate_data.py -r 1000 -s 9 -c 10 -cr 5`. 
-Er kunnen verschillende parameters worden meegegeven, gebruik `python generate_data.py -h` voor een overzicht.
+Description:
+Rush Hour Solver is a Python project in which we try to solve the game by implementing several algorithms. The game involves a grid with vehicles of different sizes, and the player's objective is to maneuver the vehicles to free the target vehicle (usually marked 'X') and navigate it to the exit. This project contains several features:
 
-2. Data genereren kan even duren, afhankelijk van de gekozen parameters.
-Na het genereren van de data wordt gevraagd of de onopgeloste borden ook opgeslagen moeten worden. 
-Onopgeloste borden opslaan wordt alleen aangeraden bij een lage hoeveelheid runs.
+Algorithmic Approaches:                 Utilizes different algorithmic strategies, including random moves, breadth-first search, depth-first    search, and more, to find optimal solutions to Rush Hour puzzles.
+Visualization Options:                  Provides options for visualizing the solving process, allowing users to observe the moves made by the algorithm.
+User Interaction:                       Allows users to interact with the game boards, input their own moves, and experiment with different algorithms to solve the puzzles.
+Experimentation:                        Supports experimentation with multiple game board configurations, offering insights into the efficiency of various solving algorithms.
 
-De data wordt opgeslagen in 'data/experiment/'. De bestanden zijn als volgt genoemd
-'size_startcars-endcars:date.csv' en eventueel 'unsolved_size_startcars-endcars:date.csv' voor de onopgeloste borden.
+Algorithms:
+Random (`randomise.py`):                The random algorithm creates a dictionary of all posible moves and picks a random step. This process will be repeated for the n iterations or untill the game is   solved.
+Depth Search (`depth_search.py`):   
+Breadth search (`breadth_search.py`):   
 
-3. De resultaten kunnen worden gevisualiseerd met `python code_files/visualisation/data_analysis.py -s -n 25 -m 50`.
-Gebruik `python code_files/visualisation/data_analysis.py -h` voor een overzicht van arguments.
+Installation:
+Export the whole project on your computer and make sure all dependencies (see `environment.yml`) are installed.
 
-4. Plots worden opgeslagen onder 'data/experiment_plots/' met argumenten in de naam.
+Example installation:
+conda env create -f environment.yml
 
-Methodiek van het experiment dat je hiermee uitvoert:
+git clone https://github.com/your-username/your-repo.git
 
-Er wordt een gridsearch uitgevoerd op de volgende parameters:
-- size: de grootte van het bord
-- numcars: het aantal auto's dat op het bord wordt geplaatst
-- lock_limit: het minimale toegankelijke vakjes op een rij of kolom
-- exit_distance: de minimale afstand tussen de rode auto en de uitgang
 
-Met iedere combinatie van deze parameters wordt een boord gegenereerd en daar wordt ieder algoritme op uitgevoerd.
+Usage:
+In this project an interface was designed to simplify the usage. This interface provides a dropdown menu to choose from different Rush Hour game boards (labeled "game 1" to "game 8"). Select a game board from the dropdown to visualize its initial state. Choose visualization options from the second dropdown menu ("show visualisation" or "no visualisation"). 
 
-Dit gebeurt num_runs keer.
+Select "show visualisation" to observe the solving process visually. If desired, use the "Save Figure" button to provide a name and thereby save the visual representation of the first and last game board.
+Choose "no visualisation" for a faster solution without visual feedback. Without visualisation it is also possible to repeat the process a number of times by providing this number in the entry box. This will create a experiment.csv providing the times of each experiment.
 
-Het wordt aangeraden om maar 1 variable te laten variëren door er een range ervoor in te stellen.
-Andere variaties kunnen beter in losse terminals worden uitgevoerd.
+Experiment with different solving algorithms using the provided buttons. The algorithms also correspond to the algoritms explained above:
+"depth_search":                         Executes the depth-first search algorithm.
+"breadth_search":                       Executes the breadth-first search algorithm.
+"Not reversing random algorithm":       Executes a random algorithm without reversing moves.
+"Random":                               Executes a random move algorithm.
+"User":                                 Allows the user to input moves and interact with the game board.
 
-De resultaten worden later allemaal samengevoegd voor het maken van de plots.
+Example code to open the interface:
+python main.py
+
+It is also possible to collect results using `gather_data.py`.
+
+example use:
+python generate_data.py -r 1000 -s 9 -c 10 -cr 5
+
+Various parameters can be specified; use python generate_data.py -h for an overview.
+
+Generating data may take some time, depending on the chosen parameters.
+After data generation, you will be prompted to decide whether to save the unsolved boards.
+Saving unsolved boards is recommended only for a low number of runs.
+
+The generated data is stored in 'data/experiment/'. The files are named as follows:
+'size_startcars-endcars:date.csv' and optionally 'unsolved_size_startcars-endcars:date.csv' for the unsolved boards.
+
+Experiment Methodology:
+
+A grid search is conducted on the following parameters:
+
+size: the size of the board
+numcars: the number of cars placed on the board
+lock_limit: the minimum accessible squares in a row or column
+exit_distance: the minimum distance between the red car and the exit
+For each combination of these parameters, a board is generated, and each algorithm is applied to it.
+
+This process is repeated num_runs times.
+
+It is recommended to vary only one variable by setting a range for it.
+Other variations are better executed in separate terminals.
+
+The results will later be aggregated for creating the plots.
+
+Contributing:
+This project was made by Jaap Nanne and Thijn Swinkels
 

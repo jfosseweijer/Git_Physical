@@ -1,11 +1,9 @@
-from code_files.classes.my_experiment import Experiment
+from ..classes.my_experiment import Experiment 
 import datetime
 import argparse
 
 
 
-#class Experiment:
-    #def __init__(self, size, num_cars, algorithms=[], size_range=1, num_cars_range=1, car_truck_ratio=(3,1), car_truck_range=(1,1), HV_ratio=(1,1), HV_ratio_range=(1,1), lock_limit=1, lock_limit_range=1, min_exit_distance=2, move_max=10000, num_runs=1000):
 
 def main():
     parser = argparse.ArgumentParser(description="Run the experiment with given parameters.")
