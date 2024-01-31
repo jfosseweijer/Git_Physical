@@ -1,25 +1,5 @@
 # Git_Physical
 
-# Dependencies:
-  - python=3.11
-  - numpy
-  - pandas
-  - random
-  - matplotlib
-  - matplotlib.backends.backend_tkagg
-  - seaborn
-  - itertools
-  - string
-  - time
-  - datetime
-  - tqdm
-  - os
-  - argparse
-  - tkinter
-  - PIL
-  - ttkthemes
-  - copy
-
 
 Description:
 Rush Hour Solver is a Python project in which we try to solve the game by implementing several algorithms. The game involves a grid with vehicles of different sizes, and the player's objective is to maneuver the vehicles to free the target vehicle (usually marked 'X') and navigate it to the exit. This project contains several features:

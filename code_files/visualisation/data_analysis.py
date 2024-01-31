@@ -81,7 +81,8 @@ def read_data():
     # Read files into dataframes
     dfs = []
     for file in files:
-        df = pd.read_csv(os.path.join(experiments_dir, file))
+        df = pd.read_csv(os.path.join(experiments_dir, file), encoding='ISO-8859-1')  # Ecnoding magic found on stackoverflow
+        # https://stackoverflow.com/questions/38518023/unicodedecodeerror-utf8-codec-cant-decode-byte-0x80-in-position-3131-invali
         dfs.append(df)
 
     # Concatenate dataframes
