@@ -5,7 +5,6 @@ Experiment class for generating data.
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
 import time
 from datetime import datetime
 from .board_setup import Board
