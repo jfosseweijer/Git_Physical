@@ -30,6 +30,8 @@ Optional arguments:
     -m, --min_exit_distance <min_exit_distance>
     -mr, --min_exit_distance_range <min_exit_distance_range>
     -mm, --move_max <move_max>
+
+Author: Nanne Hempel
 """
 
 

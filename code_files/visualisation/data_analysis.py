@@ -10,6 +10,8 @@ The parameters are:
 
 Usage:
     python data_analysis.py -s -m <move_max> -n <num_cars> -si <size>
+
+Author: Nanne Hempel
 """
 
 import pandas as pd
