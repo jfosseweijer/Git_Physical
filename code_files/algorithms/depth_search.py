@@ -1,16 +1,16 @@
 """
-Function(s) for the random solution baseline.
-These are meant to be called by the board class.
+Function for a deep search algorithm.
+It is meant to be called by the board_setup class.
 
-Author: Nanne Hempel
+Author: Jaap Osseweijer
 """
+
 import random
-import pandas as pd
 from ..classes.stack import Stack
 
 def depth_search(board, history: Stack, made_moves, bottom):
     """
-    Randomly select a step that is valid. Steps that undo the last move are invalid
+    Randomly select a step that is valid and hasn't been played yet
     """
     try:
         last_move = history.top()

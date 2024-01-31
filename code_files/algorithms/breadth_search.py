@@ -1,16 +1,13 @@
 """
-Function(s) for the random solution baseline.
-These are meant to be called by the board class.
+Function for the broad search algorithm.
+It is meant to be called by the board_setup class.
 
-Author: Nanne Hempel
+Author: Jaap Osseweijer
 """
-import random
-import pandas as pd
-from ..classes.queue import Queue
 
 def breadth_search(current_layer_boards: list, current_layer_index, former_layer_boards: list, former_layer_index):
     """
-    Randomly select a step that is valid. Steps that undo the last move are invalid
+    Cycles through the possible moves of the board, exluding moves that undo the last move
     """
 
     if current_layer_index != None and current_layer_index < 0:

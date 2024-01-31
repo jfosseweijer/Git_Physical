@@ -1,18 +1,18 @@
 """
 Function(s) for the random solution baseline.
-These are meant to be called by the board class.
+These are meant to be called by the board_setup class.
 
 Author: Nanne Hempel
 """
-import numpy as np
-import random
 
+import random
 
 def random_step(board):
     """
     Randomly select a step that is valid.
     """
     options = {}
+
     # For each vehicle on the board, check if it can move
     for vehicle in board.vehicles_list:
         possible_moves = []

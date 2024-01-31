@@ -1,17 +1,17 @@
 """
-Function(s) for the random solution baseline.
-These are meant to be called by the board class.
+Function for random moves, without steps backwards.
+These are meant to be called by the board_setup class.
 
-Author: 
+Author: Jaap Osseweijer
 """
 import random
-import pandas as pd
 
 def random_without_reverse(board, last_move):
     """
     Randomly select a step that is valid. Steps that undo the last move are invalid
     """
     options = {}
+
     # For each vehicle on the board, check if it can move
     for vehicle in board.vehicles_list:
         possible_moves = []

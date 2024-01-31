@@ -2,7 +2,6 @@ import numpy as np
 import itertools
 import copy
 from ..algorithms import generator as generator
-from ..classes.queue import Queue as Queue
 from ..classes.stack import Stack as Stack
 from ..visualisation.visualize import plot as visualize
 from ..algorithms.no_reverse import random_without_reverse
@@ -213,18 +212,17 @@ class Board:
         visualize(self.vehicles_list, self.size, self.exit)
 
     def plot_information(self):
+        """Returns relevant information of the board"""
         return self.vehicles_list, self.size, self.exit
     
     def random_solve(self, move_max=10000):
+        """Runs the random algorithm for a set amount of moves or until won"""
         self.iterations = 0
         while not self.is_won() and self.iterations < move_max:
-            #self.print_board()
             self.iterations += 1
             name, movement, position = random_step(self)
             vehicle = self.find_vehicle(name)
             self.update_positions_set(vehicle, position)
-            #time.sleep(0.05)
-            #print(name, movement)
 
         if self.is_won():
             print(f"Game is won in {self.iterations} moves")
@@ -232,16 +230,14 @@ class Board:
             print(f"Game not solved after {self.iterations} moves")
 
     def no_reverse_solve(self, move_max=10000):
+        """Runs the no-reverse algorithm for a set amount of moves or until won"""
         self.iterations = 0
         move = (None, 0, None)
         while not self.is_won() and self.iterations < move_max:
-            #self.print_board()
             self.iterations += 1
             move = random_without_reverse(self, move)
             vehicle = self.find_vehicle(move[0])
             self.update_positions_set(vehicle, move[2])
-            #time.sleep(0.05)
-            #print(move[0], move[1])
             
         if self.is_won():
             print(f"Game is won in {self.iterations} moves")
@@ -249,18 +245,16 @@ class Board:
             print(f"Game not solved after {self.iterations} moves")
 
     def depth_search(self, move_max=10000):
+        """Runs the deep search algorithm for a set amount of moves or until won"""
         self.iterations = 0
         bottom = 50
         history = Stack()
         made_moves = {}
         while not self.is_won() and self.iterations < move_max:
-            #self.print_board()
             self.iterations += 1
             name, movement, position, history, made_moves = depth_search(self, history, made_moves, bottom)
             vehicle = self.find_vehicle(name)
             self.update_positions_set(vehicle, position)
-            #time.sleep(0.05)
-            #print(name, movement)
             
         if self.is_won():
             print(f"Game is won in {self.iterations} moves")
@@ -268,37 +262,32 @@ class Board:
             print(f"Game not solved after {self.iterations} moves")
 
     def breadth_search(self, move_max=10000):
+        """Runs the broad search algorithm for a set amount of moves or until won"""
         self.iterations = 0
         current_layer_boards = []
         current_layer_index = None
         former_layer_boards = [(self, (None, None, None))]
         former_layer_index = 0
-        played_boards = []
+        moves_made = 0
         board: Board = copy.deepcopy(former_layer_boards[former_layer_index][0])
-        #board.print_board()
         while not board.is_won() and self.iterations < move_max:
             self.iterations += 1
             name, movement, position, current_layer_boards, current_layer_index, former_layer_boards, former_layer_index = breadth_search(current_layer_boards, current_layer_index, former_layer_boards, former_layer_index)
+            if former_layer_index == 0:
+                moves_made += 1
             board: Board = copy.deepcopy(former_layer_boards[former_layer_index][0])
             vehicle = board.find_vehicle(name)
             board.update_positions_set(vehicle, position)
             current_layer_boards.append((board, (name, movement, position)))
-            #board.print_board()
-            #time.sleep(0.05)
-            #print(name, movement)
-            #if self.iterations % 1000 == 0:
-            #    print(self.iterations)
 
         if board.is_won():
-            print(f"Game is won in {self.iterations} moves")
+            print(f"Game can be won in {moves_made}, found after {self.iterations} iterations")
+
             # Heb deze variabel nodig want: while board.is_won() en niet while self.is_won()
             self.won = True
         else:
             print(f"Game not solved after {self.iterations} moves")
             self.won = False
-
-    def astar_solve(self, move_max=10000):
-        pass
 
     def random_board_df(size, num_cars, car_truck_ratio, lock_limit, exit_distance, HV_ratio):
         """

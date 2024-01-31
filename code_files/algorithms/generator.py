@@ -9,8 +9,6 @@ import random
 import pandas as pd
 import string
 
-
-
 def generate_car_names(num_cars):
     letters = list(string.ascii_uppercase)
     letters.remove('X')
