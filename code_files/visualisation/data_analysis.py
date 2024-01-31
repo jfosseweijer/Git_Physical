@@ -67,6 +67,9 @@ def only_solved(df):
     return df, path
 
 def read_data():
+    """
+    Read data from the experiment directory.
+    """
     # Move to experiments directory
     current_dir = os.getcwd()
     data_dir = os.path.join(current_dir, 'data')
@@ -89,111 +92,69 @@ def read_data():
     return df
 
 def move_plot(df, path):
-    
-    depth_baseline = pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'Random']])
-    breadth_baseline = pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'Random']])
+    """
+    Plot the number of moves per algorithm.
+    """
+    # Create a dictionary to store the dataframes
+    df_dict = {
+        'moves_all': df,
+        'depth_base_moves': pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'Random']]),
+        'breadth_base_moves': pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'Random']]),
+        'depth_no_reverse_base_moves': pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'No_reverse']]),
+        'breadth_no_reverse_base_moves': pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'No_reverse']])
+    }
 
-    depth_no_reverse_baseline = pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'No_reverse']])
-    breadth_no_reverse_baseline = pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'No_reverse']])
-
-    # Plot distribution of moves log scale
-    sns.set_style('darkgrid')
-    sns.displot(df, x='moves', bins=125, hue='algorithm')
-    plt.savefig(path + 'moves_all.png')
-    
-    # Plot distribution of moves log scale
-    sns.set_style('darkgrid')
-    sns.displot(depth_baseline, x='moves', bins=125, hue='algorithm')
-    plt.savefig(path + 'depth_base_moves.png')
-
-    plt.clf()
-    sns.set_style('darkgrid')
-    sns.displot(breadth_baseline, x='moves', bins=125, hue='algorithm')
-    plt.savefig(path + 'breadth_base_moves.png')
-    plt.clf()
-
-    sns.set_style('darkgrid')
-    sns.displot(depth_no_reverse_baseline, x='moves', bins=125, hue='algorithm')
-    plt.savefig(path + 'depth_no_reverse_base_moves.png')
-    plt.clf()
-
-    sns.set_style('darkgrid')
-    sns.displot(breadth_no_reverse_baseline, x='moves', bins=125, hue='algorithm')
-    plt.savefig(path + 'breadth_no_reverse_base_moves.png')
+    # Iterate over the dictionary and generate the plots
+    for filename, df_subset in df_dict.items():
+        sns.set_style('darkgrid')
+        sns.displot(df_subset, x='moves', bins=125, hue='algorithm')
+        plt.savefig(path + filename + '.png')
+        plt.clf()
 
 
 def time_plot(df, path):
-
+    """
+    Scatterplot the time per algorithm.
+    """
     # Make time column log scale
     df['time'] = np.log10(df['time'])
     df = df.reset_index(drop=True)
-    depth_baseline = pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'Random']])
-    breadth_baseline = pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'Random']])
 
-    depth_no_reverse_baseline = pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'No_reverse']])
-    breadth_no_reverse_baseline = pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'No_reverse']])
+    # Create a dictionary to store the dataframes
+    df_dict = {
+        'time_all': df,
+        'time_depth_base': pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'Random']]),
+        'time_breadth_base': pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'Random']]),
+        'time_depth_no_reverse_base': pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'No_reverse']]),
+        'time_breadth_no_reverse_base': pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'No_reverse']])
+    }
 
-    # Plot scatterplot of time
-    sns.set_style('darkgrid')
-    sns.scatterplot(data=df, x='moves', y='time', hue='algorithm')
-    plt.savefig(path + 'time_all.png')
-    plt.clf()   
-    # Plot scatterplot of time
-    sns.set_style('darkgrid')
-    sns.scatterplot(data=depth_baseline, x='moves', y='time', hue='algorithm')
-    plt.savefig(path + 'time_depth_base.png')
-
-    plt.clf()
-    # Plot scatterplot of time
-    sns.set_style('darkgrid')
-    sns.scatterplot(data=breadth_baseline, x='moves', y='time', hue='algorithm')
-    plt.savefig(path + 'time_breadth_base.png')
-    plt.clf()
-
-    sns.set_style('darkgrid')
-    sns.scatterplot(data=depth_no_reverse_baseline, x='moves', y='time', hue='algorithm')
-    plt.savefig(path + 'time_depth_no_reverse_base.png')
-    plt.clf()
-
-    sns.set_style('darkgrid')
-    sns.scatterplot(data=breadth_no_reverse_baseline, x='moves', y='time', hue='algorithm')
-    plt.savefig(path + 'time_breadth_no_reverse_base.png')
-    plt.clf()
+    # Iterate over the dictionary and generate the plots
+    for filename, df_subset in df_dict.items():
+        sns.set_style('darkgrid')
+        sns.scatterplot(data=df_subset, x='moves', y='time', hue='algorithm')
+        plt.savefig(path + filename + '.png')
+        plt.clf()
 
 def time_dist(df, path):
-    
-    depth_baseline = pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'Random']])
-    breadth_baseline = pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'Random']])
+    """
+    Plot the distribution of time per algorithm.
+    """
+    # Create a dictionary to store the dataframes
+    df_dict = {
+        'dist_time_all': df,
+        'dist_time_depth_base': pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'Random']]),
+        'dist_time_breadth_base': pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'Random']]),
+        'dist_time_depth_no_reverse_base': pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'No_reverse']]),
+        'dist_time_breadth_no_reverse_base': pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'No_reverse']])
+    }
 
-    depth_no_reverse_baseline = pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'No_reverse']])
-    breadth_no_reverse_baseline = pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'No_reverse']])
-
-    # Plot distribution of time log scale
-    sns.set_style('darkgrid')
-    sns.displot(df, x='time', bins=125, hue='algorithm')
-    plt.savefig(path + 'dist_time_all.png')
-    plt.clf()
-
-    # Plot distribution of time log scale
-    sns.set_style('darkgrid')
-    sns.displot(depth_baseline, x='time', bins=125, hue='algorithm')
-    plt.savefig(path + 'dist_time_depth_base.png')
-    plt.clf()
-
-    sns.set_style('darkgrid')
-    sns.displot(breadth_baseline, x='time', bins=125, hue='algorithm')
-    plt.savefig(path + 'dist_time_breadth_base.png')
-    plt.clf()
-
-    sns.set_style('darkgrid')
-    sns.displot(depth_no_reverse_baseline, x='time', bins=125, hue='algorithm')
-    plt.savefig(path + 'dist_time_depth_no_reverse_base.png')
-    plt.clf()
-
-    sns.set_style('darkgrid')
-    sns.displot(breadth_no_reverse_baseline, x='time', bins=125, hue='algorithm')
-    plt.savefig(path + 'dist_time_breadth_no_reverse_base.png')
-    plt.clf()
+    # Iterate over the dictionary and generate the plots
+    for filename, df_subset in df_dict.items():
+        sns.set_style('darkgrid')
+        sns.displot(df_subset, x='time', bins=125, hue='algorithm')
+        plt.savefig(path + filename + '.png')
+        plt.clf()
 
 
 

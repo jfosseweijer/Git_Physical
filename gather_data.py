@@ -33,7 +33,7 @@ Optional arguments:
 """
 
 
-from my_experiment import Experiment
+from code_files.visualisation.my_experiment import Experiment
 import datetime
 import argparse
 
