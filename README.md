@@ -1,6 +1,22 @@
 # Git_Physical
 
-Voor dependencies, zie `environment.yml`.
+# Dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - random
+  - matplotlib
+  - matplotlib.backends.backend_tkagg
+  - seaborn
+  - itertools
+  - time
+  - datetime
+  - tqdm
+  - os
+  - argparse
+  - tkinter
+  - PIL
+  - ttkthemes
 
 Instructies voor het verzamelen van resultaten met willekeurige borden:
 

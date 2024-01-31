@@ -38,7 +38,11 @@ def main(solved, move_max, num_cars, size):
         solved_by_cars(df, path)
     
     print("Files saved in: ", path)
+    print_means(df)
 
+
+def print_means(df):
+    print(df.groupby(['algorithm', 'size', 'num_cars'])['moves'].mean())
 
 def only_solved(df):
     # Filter out unsolved boards and make new directory
