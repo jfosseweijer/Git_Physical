@@ -1,3 +1,38 @@
+"""
+This script runs an experiment based on the parameters provided as command-line arguments.
+
+The experiment is defined in `my_experiment` and is instantiated with the following parameters:
+- Number of runs
+- Size of the board
+- Number of cars on the board
+- Range of the size of the board
+- Range of the number of cars
+- Ratio of cars to trucks
+- Ratio of horizontal to vertical cars
+- Minimum number of accessible spaces in column or row before it is considered locked
+- Range of the lock limit
+- Minimal distance of the red car to the exit
+- Range of the min exit distance
+- Maximum number of moves. If exceeded, the board is considered unsolvable
+
+The results of the experiment are then gathered and can be used for visualization.
+
+Usage:
+    python gather_data.py -r <num_runs> -s <size> -c <num_cars> [optional arguments]
+
+Optional arguments:
+    -sr, --size_range <size_range>
+    -cr, --num_cars_range <num_cars_range>
+    -ctr, --car_truck_ratio <car_truck_ratio>
+    -hv, --HV_ratio <HV_ratio>
+    -l, --lock_limit <lock_limit>
+    -lr, --lock_limit_range <lock_limit_range>
+    -m, --min_exit_distance <min_exit_distance>
+    -mr, --min_exit_distance_range <min_exit_distance_range>
+    -mm, --move_max <move_max>
+"""
+
+
 from my_experiment import Experiment
 import datetime
 import argparse

@@ -1,3 +1,17 @@
+"""
+This script processes the data gathered by `gather_data.py` and creates visualizations.
+The visualizations are saved in the `data/experiment_plots` directory.
+The parameters of the plots can be changed with command-line arguments.
+The parameters are:
+- Whether to only use solved boards
+- Maximum number of moves
+- Number of cars
+- Size of the board
+
+Usage:
+    python data_analysis.py -s -m <move_max> -n <num_cars> -si <size>
+"""
+
 import pandas as pd
 import seaborn as sns
 import os
