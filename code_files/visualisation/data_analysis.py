@@ -6,7 +6,7 @@ import numpy as np
 import argparse
 
 
-def main(solved, move_max, num_cars, size=9):
+def main(solved, move_max, num_cars, size):
     # Read data
     df = read_data()
 
@@ -152,10 +152,11 @@ def solved_by_cars(df, path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-s','--solved', action='store_true')
+    parser.add_argument('-si','--board_size', type=int, default=9)
     parser.add_argument('-sa','--separate_algorithm', action='store_true')
     parser.add_argument('-n','--num_cars', type=int, default=0, help='0 for all')
     parser.add_argument('-m','--move_max', type=int, default=2500)
     args = parser.parse_args()
 
     
-    main(args.solved, args.move_max, args.num_cars)
+    main(args.solved, args.move_max, args.num_cars, args.board_size)
