@@ -1,4 +1,4 @@
-name: progLab
+name: RushHour
 channels:
   - conda-forge
 dependencies:
