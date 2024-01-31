@@ -4,10 +4,10 @@ Voor dependencies, zie `environment.yml`.
 
 Instructies voor het verzamelen van resultaten:
 
-1. Data genereren gaat met `python generate_data.py`. 
-Dit vraagt vervolgens user input voor een aantal parameters. De eerste drie hiervan zijn verplicht, de rest is optioneel.
+1. Data genereren gaat met bijv. `python generate_data.py -r 1000 -s 9 -c 10 -cr 5`. 
+Er kunnen verschillende parameters worden meegegeven, gebruik `python generate_data.py -h` voor een overzicht.
 
-2. Na de laatste parameter wordt de data gegenereerd. Dit kan even duren, afhankelijk van de gekozen parameters.
+2. Data genereren kan even duren, afhankelijk van de gekozen parameters.
 Na het genereren van de data wordt gevraagd of de onopgeloste borden ook opgeslagen moeten worden. 
 Onopgeloste borden opslaan wordt alleen aangeraden bij een lage hoeveelheid runs.
 
