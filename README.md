@@ -32,18 +32,18 @@ Export the whole project on your computer and make sure all dependencies (see `e
 
 
 ## Usage:
-In this project an interface was designed to simplify the usage. This interface provides a dropdown menu to choose from different Rush Hour game boards (labeled "game 1" to "game 8"). Select a game board from the dropdown to visualize its initial state. Choose visualization options from the second dropdown menu ("show visualisation" or "no visualisation"). 
+In this project an interface was designed to simplify the usage. This interface provides a dropdown menu to choose from different Rush Hour game boards (labeled **game 1** to **game 8**). Select a game board from the dropdown to visualize its initial state. Choose visualization options from the second dropdown menu ("show visualisation" or **no visualisation**). 
 
-Select "show visualisation" to observe the solving process visually. If desired, use the "Save Figure" button to provide a name and thereby save the visual representation of the first and last game board.
-Choose "no visualisation" for a faster solution without visual feedback. Without visualisation it is also possible to repeat the process a number of times by providing this number in the entry box. This will create a experiment.csv providing the times of each experiment.
+Select **show visualisation** to observe the solving process visually. If desired, use the **Save Figure** button to provide a name and thereby save the visual representation of the first and last game board.
+Choose **no visualisation** for a faster solution without visual feedback. Without visualisation it is also possible to repeat the process a number of times by providing this number in the entry box. This will create a experiment.csv providing the times of each experiment.
 
 Experiment with different solving algorithms using the provided buttons. The algorithms also correspond to the algoritms explained above:
 
-- "depth_search":                         Executes the deep-first search algorithm.
-- "breadth_search":                       Executes the broad-first search algorithm.
-- "Not reversing random algorithm":       Executes a random algorithm without reversing moves.
-- "Random":                               Executes a random move algorithm.
-- "User":                                 Allows the user to input moves and interact with the game board.
+- **depth_search**:                         Executes the deep-first search algorithm.
+- **breadth_search**:                       Executes the broad-first search algorithm.
+- **Not reversing random algorithm**:       Executes a random algorithm without reversing moves.
+- **Random**:                               Executes a random move algorithm.
+- **User**:                                 Allows the user to input moves and interact with the game board.
 
 Example code to open the interface:
 python main.py
@@ -53,7 +53,7 @@ It is also possible to collect results using `code_file/visualisation/gather_dat
 ### Example use:
 '`python code_file/visualisation/gather_data.py -r 100 -s 9 -c 10 -cr 5`
 
-Various parameters can be specified; use python gather_data.py -h for an overview.
+Various parameters can be specified; use `python gather_data.py -h` for an overview.
 
 Generating data may take some time, depending on the chosen parameters.
 After data generation, you will be prompted to decide whether to save the unsolved boards.
@@ -66,13 +66,14 @@ The generated data is stored in `data/experiment/`. The files are named as follo
 
 A grid search is conducted on the following parameters:
 
-- size: the size of the board
-- numcars: the number of cars placed on the board
-- lock_limit: the minimum accessible squares in a row or column
-- exit_distance: the minimum distance between the red car and the exit
+- **size**: The size of the board
+- **numcars**: The number of cars placed on the board
+- **lock_limit**: The minimum accessible squares in a row or column
+- **exit_distance**: The minimum distance between the red car and the exit
+
 For each combination of these parameters, a board is generated, and each algorithm is applied to it.
 
-This process is repeated num_runs times.
+This process is repeated `num_runs` times.
 
 It is recommended to vary only one variable by setting a range for it.
 Other variations are better executed in separate terminals.
@@ -84,4 +85,4 @@ This project was made by Jaap Osseweijer, Nanne Hempel and Thijn Swinkels
 
 
 ## Special Thanks:
-We would like to thank our supervisors, Jip Greven and Kim Koomen, for their guidance and support throughout the project. We would also like to thank the TAs for their help and feedback.
+We would like to thank our supervisors, Jip Greven and Kim Koomen, for their guidance and support throughout the project. We would also like to thank the TA's for their help and feedback.
