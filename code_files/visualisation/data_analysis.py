@@ -2,23 +2,132 @@ import pandas as pd
 import seaborn as sns
 import os
 import matplotlib.pyplot as plt
+import numpy as np
+import argparse
 
 
-# Move to experiments directory
-current_dir = os.getcwd()
-grandparent_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
-data_dir = os.path.join(grandparent_dir, 'data')
-experiments_dir = os.path.join(data_dir, 'experiments')
+def main(solved, move_max, num_cars, size=9):
+    # Read data
+    df = read_data()
 
-# Read files that start with 'test'
-files = [file for file in os.listdir(experiments_dir) if file.startswith('test')]
+    # Clean unnecessary variations
+    df = df[df['HV_ratio'] == '(1, 1)']
+    df = df[df['car_truck_ratio'] == '(3, 1)']
 
-# Read files into dataframes
-dfs = []
-for file in files:
-    df = pd.read_csv(os.path.join(experiments_dir, file))
-    dfs.append(df)
+    # Filter out boards with more than move_max moves
+    df = df[df['moves'] <= move_max]
 
-# Concatenate dataframes
-df = pd.concat(dfs)
+    df = df[df['size'] == size]
 
+    if num_cars != 0:
+        df = df[df['num_cars'] == num_cars]
+    
+    if solved:
+        df, path = only_solved(df)
+    else:
+        path = 'data/experiment_plots/all/'
+
+
+    path += f'max_{move_max}/'
+    os.makedirs(path, exist_ok=True)
+    
+    time_plot(df, path)
+    move_plot(df, path)
+
+    if solved:
+        solved_by_cars(df, path)
+    
+    print("All good")
+
+
+def only_solved(df):
+    # Filter out unsolved boards and make new directory
+    df = df[df['solved'] == 'Solved']
+    path = 'data/experiment_plots/solved/'
+
+    return df, path
+
+def read_data():
+    # Move to experiments directory
+    current_dir = os.getcwd()
+    data_dir = os.path.join(current_dir, 'data')
+    experiments_dir = os.path.join(data_dir, 'experiment')
+
+    # Read files that start with 'test'
+    files = [file for file in os.listdir(experiments_dir)]
+
+    # Read files into dataframes
+    dfs = []
+    for file in files:
+        df = pd.read_csv(os.path.join(experiments_dir, file))
+        dfs.append(df)
+
+    # Concatenate dataframes
+    df = pd.concat(dfs)
+    # Name first column 'board'
+    df = df.rename(columns={'Unnamed: 0': 'board'})
+    df['board'] = df.index // 4
+    return df
+
+def move_plot(df, path):
+    
+    depth_baseline = pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'Random']])
+    breadth_baseline = pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'Random']])
+
+    # Plot distribution of moves log scale
+    sns.set_style('darkgrid')
+    sns.displot(df, x='moves', bins=125, hue='algorithm')
+    plt.savefig(path + 'moves_all.png')
+    
+    # Plot distribution of moves log scale
+    sns.set_style('darkgrid')
+    sns.displot(depth_baseline, x='moves', bins=125, hue='algorithm')
+    plt.savefig(path + 'depth_base_moves.png')
+
+    plt.clf()
+    sns.set_style('darkgrid')
+    sns.displot(breadth_baseline, x='moves', bins=125, hue='algorithm')
+    plt.savefig(path + 'breadth_base_moves.png')
+
+def time_plot(df, path):
+
+    # Make time column log scale
+    df['time'] = np.log10(df['time'])
+    df = df.reset_index(drop=True)
+    depth_baseline = pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'Random']])
+    breadth_baseline = pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'Random']])
+
+    # Plot scatterplot of time
+    sns.set_style('darkgrid')
+    sns.scatterplot(data=df, x='moves', y='time', hue='algorithm')
+    plt.savefig(path + 'time_all.png')
+    plt.clf()   
+    # Plot scatterplot of time
+    sns.set_style('darkgrid')
+    sns.scatterplot(data=depth_baseline, x='moves', y='time', hue='algorithm')
+    plt.savefig(path + 'time_depth_base.png')
+
+    plt.clf()
+    # Plot scatterplot of time
+    sns.set_style('darkgrid')
+    sns.scatterplot(data=breadth_baseline, x='moves', y='time', hue='algorithm')
+    plt.savefig(path + 'time_breadth_base.png')
+
+def solved_by_cars(df, path):
+
+    sns.set_style('darkgrid')
+    sns.countplot(data=df, x='num_cars', hue='algorithm')
+    plt.title('Count of solved boards per number of cars')
+    plt.savefig(path + 'solved_per_num_cars.png')
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-s','--solved', action='store_true')
+    parser.add_argument('-sa','--separate_algorithm', action='store_true')
+    parser.add_argument('-n','--num_cars', type=int, default=0, help='0 for all')
+    parser.add_argument('-m','--move_max', type=int, default=2500)
+    args = parser.parse_args()
+
+    
+    main(args.solved, args.move_max, args.num_cars)
