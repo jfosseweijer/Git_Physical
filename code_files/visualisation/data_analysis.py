@@ -74,6 +74,9 @@ def move_plot(df, path):
     depth_baseline = pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'Random']])
     breadth_baseline = pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'Random']])
 
+    depth_no_reverse_baseline = pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'No_reverse']])
+    breadth_no_reverse_baseline = pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'No_reverse']])
+
     # Plot distribution of moves log scale
     sns.set_style('darkgrid')
     sns.displot(df, x='moves', bins=125, hue='algorithm')
@@ -88,6 +91,17 @@ def move_plot(df, path):
     sns.set_style('darkgrid')
     sns.displot(breadth_baseline, x='moves', bins=125, hue='algorithm')
     plt.savefig(path + 'breadth_base_moves.png')
+    plt.clf()
+
+    sns.set_style('darkgrid')
+    sns.displot(depth_no_reverse_baseline, x='moves', bins=125, hue='algorithm')
+    plt.savefig(path + 'depth_no_reverse_base_moves.png')
+    plt.clf()
+
+    sns.set_style('darkgrid')
+    sns.displot(breadth_no_reverse_baseline, x='moves', bins=125, hue='algorithm')
+    plt.savefig(path + 'breadth_no_reverse_base_moves.png')
+
 
 def time_plot(df, path):
 
@@ -96,6 +110,9 @@ def time_plot(df, path):
     df = df.reset_index(drop=True)
     depth_baseline = pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'Random']])
     breadth_baseline = pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'Random']])
+
+    depth_no_reverse_baseline = pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'No_reverse']])
+    breadth_no_reverse_baseline = pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'No_reverse']])
 
     # Plot scatterplot of time
     sns.set_style('darkgrid')
@@ -112,6 +129,17 @@ def time_plot(df, path):
     sns.set_style('darkgrid')
     sns.scatterplot(data=breadth_baseline, x='moves', y='time', hue='algorithm')
     plt.savefig(path + 'time_breadth_base.png')
+    plt.clf()
+
+    sns.set_style('darkgrid')
+    sns.scatterplot(data=depth_no_reverse_baseline, x='moves', y='time', hue='algorithm')
+    plt.savefig(path + 'time_depth_no_reverse_base.png')
+    plt.clf()
+
+    sns.set_style('darkgrid')
+    sns.scatterplot(data=breadth_no_reverse_baseline, x='moves', y='time', hue='algorithm')
+    plt.savefig(path + 'time_breadth_no_reverse_base.png')
+    plt.clf()
 
 def solved_by_cars(df, path):
 

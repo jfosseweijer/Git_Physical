@@ -14,6 +14,8 @@ Onopgeloste borden opslaan wordt alleen aangeraden bij een lage hoeveelheid runs
 De data wordt opgeslagen in 'data/experiment/'. De bestanden zijn als volgt genoemd
 'size_startcars-endcars:date.csv' en eventueel 'unsolved_size_startcars-endcars:date.csv' voor de onopgeloste borden.
 
+3. De resultaten kunnen worden gevisualiseerd met `python code_files/visualisation/data_analysis.py -s -n 25 -m 50`.
+Gebruik `python code_files/visualisation/data_analysis.py -h` voor een overzicht van arguments.
 
 Methodiek van het experiment:
 
