@@ -28,7 +28,7 @@ def main(solved, move_max, num_cars, size):
         path = 'data/experiment_plots/all/'
 
 
-    path += f'max_{move_max}_num_cars{num_cars}/'
+    path += f'max:{move_max}_num_cars:{num_cars}_size:{size}/'
     os.makedirs(path, exist_ok=True)
     
     time_plot(df, path)
@@ -37,7 +37,7 @@ def main(solved, move_max, num_cars, size):
     if solved:
         solved_by_cars(df, path)
     
-    print("All good")
+    print("Files saved in: ", path)
 
 
 def only_solved(df):
@@ -153,7 +153,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-s','--solved', action='store_true')
     parser.add_argument('-si','--board_size', type=int, default=9)
-    parser.add_argument('-sa','--separate_algorithm', action='store_true')
     parser.add_argument('-n','--num_cars', type=int, default=0, help='0 for all')
     parser.add_argument('-m','--move_max', type=int, default=2500)
     args = parser.parse_args()
