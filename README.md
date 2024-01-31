@@ -2,7 +2,7 @@
 
 Voor dependencies, zie `environment.yml`.
 
-Instructies voor het verzamelen van resultaten:
+Instructies voor het verzamelen van resultaten met willekeurige borden:
 
 1. Data genereren gaat met bijv. `python generate_data.py -r 1000 -s 9 -c 10 -cr 5`. 
 Er kunnen verschillende parameters worden meegegeven, gebruik `python generate_data.py -h` voor een overzicht.
@@ -17,7 +17,9 @@ De data wordt opgeslagen in 'data/experiment/'. De bestanden zijn als volgt geno
 3. De resultaten kunnen worden gevisualiseerd met `python code_files/visualisation/data_analysis.py -s -n 25 -m 50`.
 Gebruik `python code_files/visualisation/data_analysis.py -h` voor een overzicht van arguments.
 
-Methodiek van het experiment:
+4. Plots worden opgeslagen onder 'data/experiment_plots/' met argumenten in de naam.
+
+Methodiek van het experiment dat je hiermee uitvoert:
 
 Er wordt een gridsearch uitgevoerd op de volgende parameters:
 - size: de grootte van het bord

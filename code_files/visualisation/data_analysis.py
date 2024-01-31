@@ -28,7 +28,7 @@ def main(solved, move_max, num_cars, size=9):
         path = 'data/experiment_plots/all/'
 
 
-    path += f'max_{move_max}/'
+    path += f'max_{move_max}_num_cars{num_cars}/'
     os.makedirs(path, exist_ok=True)
     
     time_plot(df, path)
