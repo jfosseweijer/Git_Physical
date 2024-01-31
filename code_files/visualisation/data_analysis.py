@@ -152,6 +152,7 @@ def time_dist(df, path):
 
     # Iterate over the dictionary and generate the plots
     for filename, df_subset in df_dict.items():
+        df_subset = df_subset.reset_index(drop=True)  # reset the index
         sns.set_style('darkgrid')
         sns.displot(df_subset, x='time', bins=125, hue='algorithm')
         plt.savefig(path + filename + '.png')
