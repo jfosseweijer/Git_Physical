@@ -1,7 +1,6 @@
-from ..classes.my_experiment import Experiment 
+from code_files.classes.my_experiment import Experiment
 import datetime
 import argparse
-
 
 
 

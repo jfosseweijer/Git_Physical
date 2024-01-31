@@ -91,5 +91,8 @@ Other variations are better executed in separate terminals.
 The results will later be aggregated for creating the plots.
 
 Contributing:
-This project was made by Jaap Nanne and Thijn Swinkels
+This project was made by Jaap, Nanne Hempel and Thijn Swinkels
 
+
+Special Thanks:
+We would like to thank our supervisors, Jip Greven and Kim Koomen, for their guidance and support throughout the project. We would also like to thank the TAs for their help and feedback.
