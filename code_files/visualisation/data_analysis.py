@@ -58,7 +58,7 @@ def read_data():
     data_dir = os.path.join(current_dir, 'data')
     experiments_dir = os.path.join(data_dir, 'experiment')
 
-    # Read files that start with 'test'
+    # Read files 
     files = [file for file in os.listdir(experiments_dir)]
 
     # Read files into dataframes
@@ -180,7 +180,7 @@ def time_dist(df, path):
     sns.displot(breadth_no_reverse_baseline, x='time', bins=125, hue='algorithm')
     plt.savefig(path + 'dist_time_breadth_no_reverse_base.png')
     plt.clf()
-    
+
 
 
 def solved_by_cars(df, path):
