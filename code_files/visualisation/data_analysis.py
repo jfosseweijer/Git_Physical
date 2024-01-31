@@ -10,6 +10,8 @@ The parameters are:
 
 Usage:
     python data_analysis.py -s -m <move_max> -n <num_cars> -si <size>
+
+Author: Nanne Hempel
 """
 
 import pandas as pd
@@ -24,9 +26,6 @@ def main(solved, move_max, num_cars, size):
     # Read data
     df = read_data()
 
-    # Clean unnecessary variations
-    df = df[df['HV_ratio'] == '(1, 1)']
-    df = df[df['car_truck_ratio'] == '(3, 1)']
 
     # Filter out boards with more than move_max moves
     df = df[df['moves'] <= move_max]

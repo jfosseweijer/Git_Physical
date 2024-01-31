@@ -1,5 +1,8 @@
 """
 Experiment class for generating data.
+
+
+Author: Nanne Hempel
 """
 
 import pandas as pd
