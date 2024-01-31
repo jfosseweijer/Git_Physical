@@ -1,4 +1,4 @@
-from code_files.classes.my_experiment import Experiment
+from my_experiment import Experiment
 import datetime
 import argparse
 

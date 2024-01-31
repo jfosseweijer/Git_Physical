@@ -59,12 +59,12 @@ Experiment with different solving algorithms using the provided buttons. The alg
 Example code to open the interface:
 python main.py
 
-It is also possible to collect results using `gather_data.py`.
+It is also possible to collect results using `code_file/visualisation/gather_data.py`.
 
 example use:
-python generate_data.py -r 1000 -s 9 -c 10 -cr 5
+python code_file/visualisation/gather_data.py -r 100 -s 9 -c 10 -cr 5
 
-Various parameters can be specified; use python generate_data.py -h for an overview.
+Various parameters can be specified; use python gather_data.py -h for an overview.
 
 Generating data may take some time, depending on the chosen parameters.
 After data generation, you will be prompted to decide whether to save the unsolved boards.

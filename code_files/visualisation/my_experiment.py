@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import time
 from datetime import datetime
-from .board_setup import Board
+from ..classes.board_setup import Board
 from tqdm import tqdm
 from itertools import product
 
