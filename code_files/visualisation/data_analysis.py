@@ -32,6 +32,7 @@ def main(solved, move_max, num_cars, size):
     os.makedirs(path, exist_ok=True)
     
     time_plot(df, path)
+    time_dist(df, path)
     move_plot(df, path)
 
     if solved:
@@ -144,6 +145,43 @@ def time_plot(df, path):
     sns.scatterplot(data=breadth_no_reverse_baseline, x='moves', y='time', hue='algorithm')
     plt.savefig(path + 'time_breadth_no_reverse_base.png')
     plt.clf()
+
+def time_dist(df, path):
+    
+    depth_baseline = pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'Random']])
+    breadth_baseline = pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'Random']])
+
+    depth_no_reverse_baseline = pd.concat([df[df['algorithm'] == 'Depth-first'], df[df['algorithm'] == 'No_reverse']])
+    breadth_no_reverse_baseline = pd.concat([df[df['algorithm'] == 'Breadth-first'], df[df['algorithm'] == 'No_reverse']])
+
+    # Plot distribution of time log scale
+    sns.set_style('darkgrid')
+    sns.displot(df, x='time', bins=125, hue='algorithm')
+    plt.savefig(path + 'dist_time_all.png')
+    plt.clf()
+
+    # Plot distribution of time log scale
+    sns.set_style('darkgrid')
+    sns.displot(depth_baseline, x='time', bins=125, hue='algorithm')
+    plt.savefig(path + 'dist_time_depth_base.png')
+    plt.clf()
+
+    sns.set_style('darkgrid')
+    sns.displot(breadth_baseline, x='time', bins=125, hue='algorithm')
+    plt.savefig(path + 'dist_time_breadth_base.png')
+    plt.clf()
+
+    sns.set_style('darkgrid')
+    sns.displot(depth_no_reverse_baseline, x='time', bins=125, hue='algorithm')
+    plt.savefig(path + 'dist_time_depth_no_reverse_base.png')
+    plt.clf()
+
+    sns.set_style('darkgrid')
+    sns.displot(breadth_no_reverse_baseline, x='time', bins=125, hue='algorithm')
+    plt.savefig(path + 'dist_time_breadth_no_reverse_base.png')
+    plt.clf()
+    
+
 
 def solved_by_cars(df, path):
 
